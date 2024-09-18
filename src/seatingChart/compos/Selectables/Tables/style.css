@@ -1,0 +1,12 @@
+.table-col {
+   position: absolute;
+   bottom: 0px;
+   /* margin: 16px; */
+   display: flex;
+   flex-direction: column;
+}
+
+.table-row {
+   display: flex;
+   flex-direction: row;
+}

@@ -1,0 +1,39 @@
+{
+  "name": "bellyuptools",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:landing dev:reportTools dev:seatingChart",
+    "build": "npm-run-all --parallel build:landing build:reportTools build:seatingChart",
+    "preview": "npm-run-all --parallel preview:landing preview:reportTools preview:seatingChart",
+    "dev:landing": "vite --config vite.config.landing.ts",
+    "build:landing": "vite build --config vite.config.landing.ts",
+    "preview:landing": "vite preview --config vite.config.landing.ts",
+    "dev:reportTools": "vite --config vite.config.reportTools.ts",
+    "build:reportTools": "vite build --config vite.config.reportTools.ts",
+    "preview:reportTools": "vite preview --config vite.config.reportTools.ts",
+    "dev:seatingChart": "vite --config vite.config.seatingChart.ts",
+    "build:seatingChart": "vite build --config vite.config.seatingChart.ts",
+    "preview:seatingChart": "vite preview --config vite.config.seatingChart.ts",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "dependencies": {
+    "firebase": "^10.12.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.4"
+  }
+}

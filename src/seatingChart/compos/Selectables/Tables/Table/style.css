@@ -1,0 +1,55 @@
+.table {
+   width: 1in;
+   height: 1in;
+   margin: 18px;
+   border-radius: 50%;
+   border: 2px dashed black;
+   position: relative;
+   transition: box-shadow 0.3s;
+   transition: background-color 0.3s;
+}
+.table:hover {
+   cursor: pointer;
+}
+.table.vacant {
+   background-color: rgb(229, 229, 229);
+}
+.table.vacant:hover {
+   background-color: rgb(241, 241, 241);
+   border: 2px solid rgb(0, 92, 158);
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.table.selected {
+   background-color: rgb(148, 203, 241);
+   border: 2px solid rgb(0, 92, 158);
+}
+.table.assigned {
+   border: 2px solid black;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-id {
+   color: black;
+   background-color: white;
+   position: absolute;
+   z-index: 20;
+   top: 0.9in;
+   left: -0.1in;
+   font-size: 16px;
+}
+
+@media print {
+   .table.selected {
+      border: 2px dashed black;
+   }
+   .table.selected.ass {
+      border: 2px solid black;
+   }
+   .table.vacant {
+      border: 2px dashed black;
+   }
+   .table.vacant:hover {
+      border: 2px dashed black;
+      box-shadow: none;
+   }
+}

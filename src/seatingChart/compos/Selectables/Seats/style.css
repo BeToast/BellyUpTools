@@ -1,0 +1,12 @@
+.seat-col {
+   position: absolute;
+   display: flex;
+   flex-direction: column;
+   bottom: 150px;
+   left: 150px;
+}
+
+.seat-row {
+   display: flex;
+   flex-direction: row;
+}

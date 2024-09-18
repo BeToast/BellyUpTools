@@ -1,0 +1,66 @@
+:root {
+   --seat-width: 0.4in;
+   --seat-height: 0.4in;
+}
+
+.seat {
+   width: var(--seat-width);
+   height: var(--seat-height);
+   border: 1px dashed black;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: -0.5px;
+   transition: box-shadow 0.3s;
+   transition: background-color 0.3s;
+}
+.seat:hover {
+   cursor: pointer;
+}
+.seat.vacant {
+   background-color: rgb(229, 229, 229);
+}
+.seat.vacant:hover {
+   z-index: 20;
+   background-color: rgb(241, 241, 241);
+   border: 1px solid rgb(0, 92, 158);
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.seat.selected {
+   background-color: rgb(148, 203, 241);
+   border: 1px solid rgb(0, 92, 158);
+   z-index: 20;
+}
+.seat.assigned {
+   border: 1px solid black;
+   z-index: 10;
+}
+
+.seat-id {
+   color: black;
+   font-size: 14px;
+}
+
+.invis {
+   visibility: hidden;
+}
+
+.relative {
+   position: relative;
+}
+
+@media print {
+   .seat.selected {
+      border: 1px dashed black;
+   }
+   .seat.selected.ass {
+      border: 1px solid black;
+   }
+   .seat.vacant {
+      border: 1px dashed black;
+   }
+   .seat.vacant:hover {
+      border: 1px dashed black;
+      box-shadow: none;
+   }
+}

@@ -1,0 +1,18 @@
+.party-name {
+   background-color: white;
+   border-radius: 8px;
+   padding: 0 4px;
+}
+
+.party-divider {
+   width: 100%;
+   border-radius: 8px;
+   height: 2px;
+   background-color: rgb(0, 0, 0);
+   margin-left: 4px;
+   margin-right: 4px;
+   z-index: 50;
+}
+.party-divider:last-child {
+   display: none;
+}

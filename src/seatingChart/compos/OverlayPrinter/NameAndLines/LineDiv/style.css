@@ -1,0 +1,7 @@
+.line {
+   position: absolute;
+   height: 0px;
+   border-top: 2px solid black;
+   transform-origin: 0 0;
+   pointer-events: none;
+}

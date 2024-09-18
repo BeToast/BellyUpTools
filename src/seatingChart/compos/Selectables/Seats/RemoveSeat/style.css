@@ -1,0 +1,23 @@
+.remove-wrapper {
+   position: absolute;
+   top: calc(var(--seat-height) / -2);
+   left: calc(var(--seat-width) / -2);
+   transform: translate(-25%, -50%);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+.remove-seat {
+   width: 0.2in;
+   height: 0.2in;
+   fill: rgb(249, 97, 97);
+   border-radius: 4px;
+   margin: -0.5px;
+   background-color: transparent;
+   transition: 0.25s ease;
+}
+.remove-seat:hover {
+   box-shadow: 0 0 10px rgba(121, 121, 121, 0.5);
+   background-color: rgb(249, 97, 97);
+   fill: white;
+}

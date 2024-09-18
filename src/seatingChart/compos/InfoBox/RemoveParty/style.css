@@ -1,0 +1,18 @@
+:root {
+   --remove-color: rgb(249, 97, 97);
+}
+
+.remove-party {
+   width: 0.3in;
+   height: 0.3in;
+   fill: var(--remove-color);
+   border-radius: 4px;
+   background-color: transparent;
+   transition: 0.25s ease;
+}
+
+.remove-party:hover {
+   box-shadow: 0 0 10px rgba(121, 121, 121, 0.5);
+   background-color: var(--remove-color);
+   fill: white;
+}

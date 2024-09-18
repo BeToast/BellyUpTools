@@ -1,0 +1,18 @@
+:root {
+   --connect-color: rgb(64, 81, 178);
+}
+
+.connected-button {
+   width: 0.3in;
+   height: 0.3in;
+   fill: var(--connect-color);
+   border-radius: 4px;
+   background-color: transparent;
+   transition: 0.25s ease;
+}
+
+.connected-button:hover {
+   box-shadow: 0 0 10px rgba(121, 121, 121, 0.5);
+   background-color: var(--connect-color);
+   fill: white;
+}

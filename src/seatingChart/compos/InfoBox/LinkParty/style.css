@@ -1,0 +1,44 @@
+.linked-with {
+   font-size: 24px;
+   font-weight: 400;
+}
+
+.linked-party-wrapper {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: left;
+   gap: 8px;
+}
+
+.linked-party {
+   font-size: 22px;
+   font-weight: 400;
+   display: flex;
+   flex-direction: row;
+   justify-content: left;
+   align-items: center;
+   gap: 8px;
+}
+.link-option {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   gap: 8px;
+   font-size: 22px;
+   font-weight: 400;
+}
+.link-option:hover {
+   cursor: pointer;
+}
+
+.party-input {
+   font-size: 18px;
+   padding: 8px;
+   background-color: rgb(239, 239, 239);
+   border: 1px solid #ccc;
+   box-sizing: border-box;
+   border-radius: 4px;
+   flex-grow: 1;
+   width: 100%;
+}

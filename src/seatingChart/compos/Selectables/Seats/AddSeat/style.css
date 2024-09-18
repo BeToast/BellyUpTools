@@ -1,0 +1,27 @@
+.add-seat {
+   width: 0.4in;
+   height: 0.4in;
+   border: 1px solid rgb(0, 31, 1);
+   background-color: rgb(195, 238, 197);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: -0.5px;
+   transition: all 0.3s;
+}
+.add-seat:hover {
+   background-color: rgb(222, 255, 224);
+   cursor: pointer;
+   /* border: 1px solid rgb(151, 207, 155); */
+}
+
+.add-seat-plus {
+   color: rgb(0, 31, 1);
+   font-size: 32px;
+}
+
+@media print {
+   .no-print {
+      display: none;
+   }
+}

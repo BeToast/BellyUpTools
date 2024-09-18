@@ -1,0 +1,61 @@
+{
+  "hosting": {
+    "site": "bellyuptools",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/reportTools/**/*.@(js|css|png|jpg|jpeg|gif|ico|json)",
+        "destination": "/reportTools/:splat"
+      },
+      {
+        "source": "/reportTools/**",
+        "destination": "/reportTools/index.html"
+      },
+      {
+        "source": "/seatingChart/**/*.@(js|css|png|jpg|jpeg|gif|ico|json)",
+        "destination": "/seatingChart/:splat"
+      },
+      {
+        "source": "/seatingChart/**",
+        "destination": "/seatingChart/index.html"
+      },
+      {
+        "source": "/landing/**/*.@(js|css|png|jpg|jpeg|gif|ico|json)",
+        "destination": "/landing/:splat"
+      },
+      {
+        "source": "**/*.@(js|css|png|jpg|jpeg|gif|ico|json)",
+        "destination": "/:splat"
+      },
+      {
+        "source": "**",
+        "destination": "/landing/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=7776000"
+          }
+        ]
+      }
+    ]
+  }
+}
