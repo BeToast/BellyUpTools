@@ -19,11 +19,17 @@
     "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
+    "file-saver": "^2.0.5",
     "firebase": "^10.12.4",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/jspdf": "^2.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
