@@ -168,7 +168,6 @@ Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
 
 const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
 export const dateFromString = (completed: string): Date => {
-   console.log(completed);
    if (!completed) return new Date();
 
    const match = completed.match(dateRegex);
