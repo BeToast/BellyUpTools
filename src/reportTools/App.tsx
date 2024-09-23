@@ -90,7 +90,7 @@ const App: React.FC = () => {
       <div className="horz-center">
          <div className="App">
             <div className="title-card">
-               <h1>BellyUp reportTools 📄🛠️</h1>
+               <h1>BellyUp reportTools 📄</h1>
                <p>
                   <span style={{ fontStyle: "italic" }}>instant </span>Pacing
                   and Res Buyers

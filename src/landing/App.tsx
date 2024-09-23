@@ -8,7 +8,7 @@ function App() {
             <div className="title-card">
                <h1>Welcome to BellyUpTools</h1>
             </div>
-            <ToolLink name={"Report Tools 📈"} href={"/reportTools/"} />
+            <ToolLink name={"Report Tools 📄"} href={"/reportTools/"} />
             <ToolLink
                name={"Seating Chart Builder 🪑"}
                href={"/seatingChart/"}
