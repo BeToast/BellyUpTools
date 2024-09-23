@@ -12,3 +12,28 @@
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
 }
+
+.horz-center {
+   display: flex;
+   justify-content: center;
+}
+
+h1 {
+   color: #1a365d;
+   margin: 0px;
+}
+h2 {
+   color: #254470;
+   margin: 0;
+
+   text-decoration: none;
+}
+p,
+pre {
+   color: #1a365d;
+   margin: 0px;
+   font-family: Arial;
+}
+a {
+   text-decoration: none;
+}

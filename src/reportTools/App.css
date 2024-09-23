@@ -1,8 +1,3 @@
-.horz-center {
-   display: flex;
-   justify-content: center;
-}
-
 .App {
    font-family: Arial, sans-serif;
    max-width: 800px;
@@ -13,21 +8,6 @@
 }
 .title-card {
    padding-left: 28px;
-}
-
-h1 {
-   color: #1a365d;
-   margin: 0px;
-}
-h2 {
-   color: #254470;
-   margin: 0;
-}
-p,
-pre {
-   color: #1a365d;
-   margin: 0px;
-   font-family: Arial;
 }
 
 .card {
