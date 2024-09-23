@@ -73,7 +73,7 @@ const App: React.FC = () => {
             <div className="title-card">
                <h1>BellyUp reportTools 📄🛠️</h1>
                <p>
-                  <span style={{ fontStyle: "italic" }}>brainless </span>Pacing
+                  <span style={{ fontStyle: "italic" }}>instant </span>Pacing
                   and Res Buyers
                </p>
             </div>
