@@ -1,5 +1,3 @@
-import { MyDate } from "../../MyDate";
-
 export const calculateSalesPacing = (
    json: any[],
    eventName: string,
@@ -19,49 +17,65 @@ export const calculateSalesPacing = (
       );
    const total = totalGa + totalRes;
 
-   const presaleGa = json
-      .filter(
-         (row) =>
-            row.Source === "Presale" &&
-            row["Ticket Type"] === "General Admission"
-      )
-      .reduce(
-         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
-         0
-      );
-   const presaleRes = json
-      .filter(
-         (row) => row.Source === "Presale" && row["Ticket Type"] === "Reserved"
-      )
-      .reduce(
-         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
-         0
-      );
-   const presale = presaleGa + presaleRes;
+   const hadPresale: boolean = json.some((row) => row.Source === "Presale");
+   var presaleGa: number = 0;
+   var presaleRes: number = 0;
+   var presale: number = 0;
 
-   console.log(json[1].Completed);
-   console.log(new Date(json[1].Completed));
-   const bongus = json
-      .filter((row) => row.Source === "Presale")
-      .map((row) => new MyDate(row.Completed));
-   console.log(bongus[0]);
+   var firstDayPublicDate: Date;
 
-   // Find the earliest presale date
-   const presaleDates = json
-      .filter((row) => row.Source === "Presale")
-      .map((row) => new Date(row.Completed).getTime());
-   const earliestPresaleDate = new Date(Math.min(...presaleDates));
+   if (hadPresale) {
+      presaleGa = json
+         .filter(
+            (row) =>
+               row.Source === "Presale" &&
+               row["Ticket Type"] === "General Admission"
+         )
+         .reduce(
+            (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+            0
+         );
+      presaleRes = json
+         .filter(
+            (row) =>
+               row.Source === "Presale" && row["Ticket Type"] === "Reserved"
+         )
+         .reduce(
+            (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+            0
+         );
+      presale = presaleGa + presaleRes;
 
-   // Calculate first day public (one day after earliest presale)
-   const firstDayPublicDate = new Date(earliestPresaleDate);
-   firstDayPublicDate.setDate(firstDayPublicDate.getDate() + 1);
+      // Find the earliest presale date
+      const earliestPresaleDate: Date = json
+         .filter((row) => row.Source === "Presale")
+         .reduce((earliest, current) => {
+            const currentDate = dateFromString(current.Completed);
+            return earliest === null || currentDate < earliest
+               ? currentDate
+               : earliest;
+         }, null as Date | null);
+
+      // Calculate first day public (one day after earliest presale)
+      firstDayPublicDate = new Date(earliestPresaleDate.getTime() + 86400000); // 86400000 ms = 1 day
+   } else {
+      firstDayPublicDate = json
+         .filter((row) => row.Source === "_Public")
+         .reduce((earliest, current) => {
+            const currentDate = dateFromString(current.Completed);
+            return earliest === null || currentDate < earliest
+               ? currentDate
+               : earliest;
+         }, null as Date | null);
+   }
 
    const firstDayPublicGa = json
       .filter((row) => {
-         const completedDate = new Date(row.Completed);
          return (
-            completedDate.toDateString() ===
-               firstDayPublicDate.toDateString() &&
+            areEqualByComponents(
+               dateFromString(row.Completed),
+               firstDayPublicDate
+            ) &&
             row.Source === "_Public" &&
             row["Ticket Type"] === "General Admission"
          );
@@ -73,10 +87,11 @@ export const calculateSalesPacing = (
 
    const firstDayPublicRes = json
       .filter((row) => {
-         const completedDate = new Date(row.Completed);
          return (
-            completedDate.toDateString() ===
-               firstDayPublicDate.toDateString() &&
+            areEqualByComponents(
+               dateFromString(row.Completed),
+               firstDayPublicDate
+            ) &&
             row.Source === "_Public" &&
             row["Ticket Type"] === "Reserved"
          );
@@ -89,15 +104,11 @@ export const calculateSalesPacing = (
    const firstDayPublic = firstDayPublicGa + firstDayPublicRes;
 
    // Calculate DOS (Day of Show) based on the event date in the file name
-   // console.log(eventDate);
 
    const dosGa = json
       .filter((row) => {
-         const completedDate = new Date(row.Completed);
-         // console.log(new Date(row.Completed).toDateString());
-         // console.log(completedDate);
          return (
-            completedDate.toDateString() === eventDate.toDateString() &&
+            areEqualByComponents(dateFromString(row.Completed), eventDate) &&
             row["Ticket Type"] === "General Admission"
          );
       })
@@ -108,9 +119,8 @@ export const calculateSalesPacing = (
 
    const dosRes = json
       .filter((row) => {
-         const completedDate = new Date(row.Completed);
          return (
-            completedDate.toDateString() === eventDate.toDateString() &&
+            areEqualByComponents(dateFromString(row.Completed), eventDate) &&
             row["Ticket Type"] === "Reserved"
          );
       })
@@ -146,8 +156,36 @@ export const calculateSalesPacing = (
 
    return `${eventName}, ${eventDate.toDateString()}
 Total: ${total} (ga ${totalGa}, res ${totalRes})
-Presale: ${presale} (ga ${presaleGa}, res ${presaleRes})
+Presale: ${
+      hadPresale
+         ? `${presale} (ga ${presaleGa}, res ${presaleRes})`
+         : "there was no presale"
+   }
 1st day public: ${firstDayPublic} (ga ${firstDayPublicGa}, res ${firstDayPublicRes})
 DOS: ${dos} (ga ${dosGa}, res ${dosRes})
 Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
+};
+
+const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
+export const dateFromString = (completed: string): Date => {
+   console.log(completed);
+   if (!completed) return new Date();
+
+   const match = completed.match(dateRegex);
+   if (match) {
+      const [, month, day, year] = match.map((n) => parseInt(n, 10));
+      // Note: month is 0-indexed in JavaScript Date object
+      return new Date(year, month - 1, day);
+   } else {
+      return new Date();
+      // throw new Error("Invalid completed: string");
+   }
+};
+
+const areEqualByComponents = (date1: Date, date2: Date): boolean => {
+   return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+   );
 };

@@ -5,6 +5,7 @@ import "./App.css";
 import "../shared/firebase";
 import Pacing from "./compos/Pacing";
 import ResBuyers from "./compos/ResBuyers";
+import { dateFromString } from "./compos/Pacing/utils";
 
 declare module "jspdf" {
    interface jsPDF {
@@ -25,19 +26,6 @@ const App: React.FC = () => {
       return match ? match[1].trim() : "Event";
    };
 
-   const extractEventDate = (fileName: string): Date => {
-      const match = fileName.match(/\d{2}-\d{2}-\d{2}/);
-      if (match) {
-         const [month, day, year] = match[0].split("-");
-         return new Date(
-            2000 + parseInt(year),
-            parseInt(month) - 1,
-            parseInt(day)
-         );
-      }
-      return new Date(); // Return current date if no match found
-   };
-
    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -47,7 +35,7 @@ const App: React.FC = () => {
       setError(null);
       setFileName(file.name);
       setEventName(extractEventName(file.name));
-      setEventDate(extractEventDate(file.name));
+      setEventDate(dateFromString(file.name));
 
       const reader = new FileReader();
 
@@ -57,7 +45,9 @@ const App: React.FC = () => {
             const workbook = XLSX.read(bstr, { type: "binary" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            setJson(XLSX.utils.sheet_to_json(worksheet) as any[]);
+            setJson(
+               XLSX.utils.sheet_to_json(worksheet, { raw: false }) as any[]
+            );
 
             setLoading(false);
          } catch (err) {
