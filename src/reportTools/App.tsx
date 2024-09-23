@@ -5,7 +5,6 @@ import "./App.css";
 import "../shared/firebase";
 import Pacing from "./compos/Pacing";
 import ResBuyers from "./compos/ResBuyers";
-import { dateFromString } from "./compos/Pacing/utils";
 
 declare module "jspdf" {
    interface jsPDF {
@@ -25,6 +24,28 @@ const App: React.FC = () => {
       const match = fileName.match(/BuyersReport_(.*?)\d{1,2}-\d{1,2}-\d{2,4}/);
       return match ? match[1].trim() : "Event";
    };
+   const extractEventDate = (fileName: string): Date => {
+      const match = fileName.match(/(\d{1,2})-(\d{1,2})-(\d{2,4})/);
+      if (!match) {
+         return new Date();
+      }
+      const [, month, day, year] = match;
+      // Convert to numbers
+      let dayNum = parseInt(day, 10);
+      let monthNum = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
+      let yearNum = parseInt(year, 10);
+      // Handle two-digit years
+      if (yearNum < 100) {
+         yearNum += yearNum < 50 ? 2000 : 1900;
+      }
+      // Create and return the Date object
+      const date = new Date(yearNum, monthNum, dayNum);
+      // Validate the date
+      if (isNaN(date.getTime())) {
+         return new Date();
+      }
+      return date;
+   };
 
    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -35,7 +56,7 @@ const App: React.FC = () => {
       setError(null);
       setFileName(file.name);
       setEventName(extractEventName(file.name));
-      setEventDate(dateFromString(file.name));
+      setEventDate(extractEventDate(file.name));
 
       const reader = new FileReader();
 
@@ -45,9 +66,7 @@ const App: React.FC = () => {
             const workbook = XLSX.read(bstr, { type: "binary" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            setJson(
-               XLSX.utils.sheet_to_json(worksheet, { raw: false }) as any[]
-            );
+            setJson(XLSX.utils.sheet_to_json(worksheet) as any[]);
 
             setLoading(false);
          } catch (err) {

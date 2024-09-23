@@ -50,7 +50,7 @@ export const calculateSalesPacing = (
       const earliestPresaleDate: Date = json
          .filter((row) => row.Source === "Presale")
          .reduce((earliest, current) => {
-            const currentDate = dateFromString(current.Completed);
+            const currentDate = excelSerialDateToJSDate(current.Completed);
             return earliest === null || currentDate < earliest
                ? currentDate
                : earliest;
@@ -62,7 +62,7 @@ export const calculateSalesPacing = (
       firstDayPublicDate = json
          .filter((row) => row.Source === "_Public")
          .reduce((earliest, current) => {
-            const currentDate = dateFromString(current.Completed);
+            const currentDate = excelSerialDateToJSDate(current.Completed);
             return earliest === null || currentDate < earliest
                ? currentDate
                : earliest;
@@ -73,7 +73,7 @@ export const calculateSalesPacing = (
       .filter((row) => {
          return (
             areEqualByComponents(
-               dateFromString(row.Completed),
+               excelSerialDateToJSDate(row.Completed),
                firstDayPublicDate
             ) &&
             row.Source === "_Public" &&
@@ -89,7 +89,7 @@ export const calculateSalesPacing = (
       .filter((row) => {
          return (
             areEqualByComponents(
-               dateFromString(row.Completed),
+               excelSerialDateToJSDate(row.Completed),
                firstDayPublicDate
             ) &&
             row.Source === "_Public" &&
@@ -108,8 +108,10 @@ export const calculateSalesPacing = (
    const dosGa = json
       .filter((row) => {
          return (
-            areEqualByComponents(dateFromString(row.Completed), eventDate) &&
-            row["Ticket Type"] === "General Admission"
+            areEqualByComponents(
+               excelSerialDateToJSDate(row.Completed),
+               eventDate
+            ) && row["Ticket Type"] === "General Admission"
          );
       })
       .reduce(
@@ -120,8 +122,10 @@ export const calculateSalesPacing = (
    const dosRes = json
       .filter((row) => {
          return (
-            areEqualByComponents(dateFromString(row.Completed), eventDate) &&
-            row["Ticket Type"] === "Reserved"
+            areEqualByComponents(
+               excelSerialDateToJSDate(row.Completed),
+               eventDate
+            ) && row["Ticket Type"] === "Reserved"
          );
       })
       .reduce(
@@ -166,20 +170,20 @@ DOS: ${dos} (ga ${dosGa}, res ${dosRes})
 Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
 };
 
-const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
-export const dateFromString = (completed: string): Date => {
-   if (!completed) return new Date();
+// const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
+// export const dateFromString = (completed: string): Date => {
+//    if (!completed) return new Date();
 
-   const match = completed.match(dateRegex);
-   if (match) {
-      const [, month, day, year] = match.map((n) => parseInt(n, 10));
-      // Note: month is 0-indexed in JavaScript Date object
-      return new Date(year, month - 1, day);
-   } else {
-      return new Date();
-      // throw new Error("Invalid completed: string");
-   }
-};
+//    const match = completed.match(dateRegex);
+//    if (match) {
+//       const [, month, day, year] = match.map((n) => parseInt(n, 10));
+//       // Note: month is 0-indexed in JavaScript Date object
+//       return new Date(year, month - 1, day);
+//    } else {
+//       return new Date();
+//       // throw new Error("Invalid completed: string");
+//    }
+// };
 
 const areEqualByComponents = (date1: Date, date2: Date): boolean => {
    return (
@@ -188,3 +192,28 @@ const areEqualByComponents = (date1: Date, date2: Date): boolean => {
       date1.getDate() === date2.getDate()
    );
 };
+
+function excelSerialDateToJSDate(serial: number): Date {
+   const utc_days = Math.floor(serial - 25568);
+   const utc_value = utc_days * 86400;
+   const date_info = new Date(utc_value * 1000);
+
+   // const fractional_day = serial - Math.floor(serial) + 0.0000001;
+
+   // let total_seconds = Math.floor(86400 * fractional_day);
+
+   // const seconds = total_seconds % 60;
+   // total_seconds -= seconds;
+
+   // const hours = Math.floor(total_seconds / (60 * 60));
+   // const minutes = Math.floor(total_seconds / 60) % 60;
+
+   return new Date(
+      date_info.getFullYear(),
+      date_info.getMonth(),
+      date_info.getDate()
+      // hours,
+      // minutes,
+      // seconds
+   );
+}
