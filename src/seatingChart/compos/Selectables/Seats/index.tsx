@@ -9,7 +9,7 @@ import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
 
 const Seats = () => {
-   const seatsDocRef = doc(db, "SeatingCharts", "devChart");
+   const docRef = doc(db, "SeatingCharts", "devChart");
 
    const [kSeats, setKSeats] = useState<Array<number>>([]);
    const bSeats = Array.from({ length: 14 }, (_, i) => 14 - i);
@@ -26,7 +26,7 @@ const Seats = () => {
 
    useEffect(() => {
       // Fetch initial count and set up listener
-      const unsubscribe = onSnapshot(seatsDocRef, (docSnapshot) => {
+      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
          if (docSnapshot.exists()) {
             const data = docSnapshot.data();
             const count = data.kSeats || 16;
@@ -64,7 +64,7 @@ const Seats = () => {
    }, [kSeats]);
 
    const addKitchenSeatHandler = async () => {
-      await updateDoc(seatsDocRef, {
+      await updateDoc(docRef, {
          kSeats: increment(1),
       });
    };
@@ -90,7 +90,7 @@ const Seats = () => {
                      <RemoveSeat
                         kSeats={kSeats}
                         setKSeats={setKSeats}
-                        seatsDocRef={seatsDocRef}
+                        docRef={docRef}
                      />
                   )}
                </React.Fragment>

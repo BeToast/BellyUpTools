@@ -8,13 +8,13 @@ import "./style.css";
 interface RemoveSeatProps {
    kSeats: number[];
    setKSeats: React.Dispatch<React.SetStateAction<number[]>>;
-   seatsDocRef: DocumentReference;
+   docRef: DocumentReference;
 }
 
 const RemoveSeat: React.FC<RemoveSeatProps> = ({
    kSeats,
    setKSeats,
-   seatsDocRef,
+   docRef,
 }) => {
    const { setAssigned } = useSelected();
 
@@ -25,7 +25,7 @@ const RemoveSeat: React.FC<RemoveSeatProps> = ({
       const seatToRemove = kSeats[0];
 
       // Update Firestore
-      await updateDoc(seatsDocRef, {
+      await updateDoc(docRef, {
          kSeats: increment(-1),
       });
 

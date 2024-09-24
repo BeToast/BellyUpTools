@@ -1,17 +1,33 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./style.css";
 import { useSelected } from "../../context/SelectedContext";
+import { db } from "../../../shared/firebase";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+
+interface InputsState {
+   show: string;
+   date: string;
+   doors: string;
+   supportTime: string;
+   mainTime: string;
+   approxEnd: string;
+   notes: string;
+}
 
 const Inputs: React.FC = () => {
    const { extraChairs } = useSelected();
 
-   const [show, setShow] = useState("");
-   const [date, setDate] = useState("");
-   const [doors, setDoors] = useState("");
-   const [supportTime, setSupportTime] = useState("");
-   const [mainTime, setMainTime] = useState("");
-   const [approxEnd, setApproxEnd] = useState("");
-   const [notes, setNotes] = useState("");
+   const docRef = doc(db, "SeatingCharts", "devChart");
+
+   const [inputs, setInputs] = useState<InputsState>({
+      show: "",
+      date: "",
+      doors: "",
+      supportTime: "",
+      mainTime: "",
+      approxEnd: "",
+      notes: "",
+   });
 
    const showInputRef = useRef<HTMLInputElement>(null);
    const dateInputRef = useRef<HTMLInputElement>(null);
@@ -21,10 +37,44 @@ const Inputs: React.FC = () => {
    const approxEndInputRef = useRef<HTMLInputElement>(null);
    const notesInputRef = useRef<HTMLTextAreaElement>(null);
 
+   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+   useEffect(() => {
+      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+         if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            setInputs(data.inputs || {});
+         }
+      });
+
+      return () => unsubscribe();
+   }, []);
+
+   useEffect(() => {
+      return () => {
+         if (updateTimeoutRef.current) {
+            clearTimeout(updateTimeoutRef.current);
+         }
+      };
+   }, []);
+
+   const updateFirestore = (newInputs: InputsState) => {
+      if (updateTimeoutRef.current) {
+         clearTimeout(updateTimeoutRef.current);
+      }
+
+      updateTimeoutRef.current = setTimeout(async () => {
+         await setDoc(docRef, { inputs: newInputs }, { merge: true });
+      }, 1000);
+   };
+
    const handleChange =
-      (setter: React.Dispatch<React.SetStateAction<string>>) =>
+      (field: keyof InputsState) =>
       (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-         setter(event.target.value);
+         const newValue = event.target.value;
+         const newInputs = { ...inputs, [field]: newValue };
+         setInputs(newInputs);
+         updateFirestore(newInputs);
       };
 
    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,8 +133,8 @@ const Inputs: React.FC = () => {
          <input
             ref={showInputRef}
             type="text"
-            value={show}
-            onChange={handleChange(setShow)}
+            value={inputs.show}
+            onChange={handleChange("show")}
             onKeyDown={handleKeyDown}
             placeholder="Show Name"
             className="input show"
@@ -92,37 +142,37 @@ const Inputs: React.FC = () => {
          <input
             ref={dateInputRef}
             type="text"
-            value={date}
-            onChange={handleChange(setDate)}
+            value={inputs.date}
+            onChange={handleChange("date")}
             onKeyDown={handleKeyDown}
             placeholder="Date"
             className="input"
          />
          {renderLabeledInput(
             "Doors:",
-            doors,
-            handleChange(setDoors),
+            inputs.doors,
+            handleChange("doors"),
             doorsInputRef,
             "7:30pm"
          )}
          {renderLabeledInput(
             "Support:",
-            supportTime,
-            handleChange(setSupportTime),
+            inputs.supportTime,
+            handleChange("supportTime"),
             supportInputRef,
             "8:30pm"
          )}
          {renderLabeledInput(
             "Main:",
-            mainTime,
-            handleChange(setMainTime),
+            inputs.mainTime,
+            handleChange("mainTime"),
             mainInputRef,
             "9:30pm"
          )}
          {renderLabeledInput(
             "Approx End:",
-            approxEnd,
-            handleChange(setApproxEnd),
+            inputs.approxEnd,
+            handleChange("approxEnd"),
             approxEndInputRef,
             "11:00pm"
          )}
@@ -140,8 +190,8 @@ const Inputs: React.FC = () => {
          <div className="label-wrapper notes-wrapper">
             <textarea
                ref={notesInputRef}
-               value={notes}
-               onChange={handleChange(setNotes)}
+               value={inputs.notes}
+               onChange={handleChange("notes")}
                placeholder="Additional notes..."
                className="input notes"
             />
