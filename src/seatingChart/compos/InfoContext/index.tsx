@@ -6,17 +6,10 @@ const InfoContext: React.FC<{}> = ({}) => {
 
    const _DEBUG = false;
 
-   if (_DEBUG) {
-      return (
-         <>
-            <div className="info-context-wrap">
-               <div className="info-context">
-                  {JSON.stringify(state, null, 2)}
-               </div>
-            </div>
-         </>
-      );
-   } else return <></>;
+   if (_DEBUG)
+      Object.entries(state).forEach(([key, value]) => console.log(key, value));
+
+   return <></>;
 };
 
 export default InfoContext;

@@ -1,38 +1,46 @@
 import React, { useEffect, useRef, useState } from "react";
+import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
+
+import { db } from "../../../../shared/firebase";
 import AddSeat from "./AddSeat";
 import Seat from "./Seat";
 import RemoveSeat from "./RemoveSeat";
 import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
 
-const MAX_POSITIVE_K_SEATS = 16; // Default number of kitchen seats
-const MAX_NEGATIVE_K_SEATS = 15; // Maximum number of additional seats
-const MAX_B_SEATS = 14; // Number of bar seats
-
 const Seats = () => {
-   const [kSeats, setKSeats] = useState<Array<number>>(
-      Array.from({ length: MAX_POSITIVE_K_SEATS }, (_, i) => i + 1)
-   );
-   const bSeats = Array.from(
-      { length: MAX_B_SEATS },
-      (_, i) => MAX_B_SEATS - i
-   );
+   const seatsDocRef = doc(db, "SeatingCharts", "devChart");
+
+   const [kSeats, setKSeats] = useState<Array<number>>([]);
+   const bSeats = Array.from({ length: 14 }, (_, i) => 14 - i);
 
    const { state, setAssigned, setExtraChairs } = useSelected();
 
    const isFirstRender = useRef(true);
 
    // Create refs for all possible seats
-   const kSeatRefs = useRef(
-      Array.from({ length: MAX_POSITIVE_K_SEATS + MAX_NEGATIVE_K_SEATS }, () =>
-         React.createRef<HTMLDivElement>()
-      )
-   );
+   const kSeatRefs = useRef<Array<React.RefObject<HTMLDivElement>>>([]);
    const bSeatRefs = useRef(
-      Array.from({ length: MAX_B_SEATS }, () =>
-         React.createRef<HTMLDivElement>()
-      )
+      Array.from({ length: 14 }, () => React.createRef<HTMLDivElement>())
    );
+
+   useEffect(() => {
+      // Fetch initial count and set up listener
+      const unsubscribe = onSnapshot(seatsDocRef, (docSnapshot) => {
+         if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            const count = data.kSeats || 16;
+            setKSeats(Array.from({ length: count }, (_, i) => i + 1));
+
+            // Ensure we have enough refs for all seats
+            while (kSeatRefs.current.length < count) {
+               kSeatRefs.current.push(React.createRef<HTMLDivElement>());
+            }
+         }
+      });
+
+      return () => unsubscribe();
+   }, []);
 
    useEffect(() => {
       if (isFirstRender.current) {
@@ -40,12 +48,7 @@ const Seats = () => {
             setAssigned(`Seat k${id}`, [], false, kSeatRefs.current[index]);
          });
          bSeats.forEach((id) => {
-            setAssigned(
-               `Seat b${id}`,
-               [],
-               false,
-               bSeatRefs.current[MAX_B_SEATS - id]
-            );
+            setAssigned(`Seat b${id}`, [], false, bSeatRefs.current[14 - id]);
          });
          isFirstRender.current = false;
       } else {
@@ -60,15 +63,13 @@ const Seats = () => {
       }
    }, [kSeats]);
 
-   const addKitchenSeatHandler = () => {
-      const newSeatId = Math.min(...kSeats) - 1;
-      if (kSeats.length < MAX_POSITIVE_K_SEATS + MAX_NEGATIVE_K_SEATS) {
-         setKSeats((prevSeats) => [newSeatId, ...prevSeats]);
-         setAssigned(`Seat k${newSeatId}`, [], false, kSeatRefs.current[0]);
-      }
+   const addKitchenSeatHandler = async () => {
+      await updateDoc(seatsDocRef, {
+         kSeats: increment(1),
+      });
    };
 
-   let extraChairs = kSeats.length - MAX_POSITIVE_K_SEATS;
+   let extraChairs = kSeats.length - 16;
    if (extraChairs > -1) {
       setExtraChairs(extraChairs);
    }
@@ -85,8 +86,12 @@ const Seats = () => {
                      displayNumber={index + 1}
                      ref={kSeatRefs.current[index]}
                   />
-                  {index === 0 && num <= 0 && (
-                     <RemoveSeat kSeats={kSeats} setKSeats={setKSeats} />
+                  {index === 0 && kSeats.length > 16 && (
+                     <RemoveSeat
+                        kSeats={kSeats}
+                        setKSeats={setKSeats}
+                        seatsDocRef={seatsDocRef}
+                     />
                   )}
                </React.Fragment>
             ))}
@@ -113,8 +118,8 @@ const Seats = () => {
                   <Seat
                      key={num}
                      id={`b${num}`}
-                     displayNumber={MAX_B_SEATS - index}
-                     ref={bSeatRefs.current[MAX_B_SEATS - num]}
+                     displayNumber={14 - index}
+                     ref={bSeatRefs.current[14 - num]}
                   />
                ))}
             </div>
