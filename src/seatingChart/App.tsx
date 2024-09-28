@@ -9,7 +9,8 @@ import PrintButton from "./compos/PrintButton";
 import Seats from "./compos/Selectables/Seats";
 import Tables from "./compos/Selectables/Tables";
 import { SelectedProvider } from "./context/SelectedContext";
-import StateToFirestore from "./context/stateToFirestore";
+import StateToFirestore from "./context/StateToFirestore";
+import FirestoreToState from "./context/FirestoreToState";
 
 function App() {
    return (
@@ -29,6 +30,7 @@ function App() {
             </div>
 
             <StateToFirestore />
+            <FirestoreToState />
          </SelectedProvider>
       </>
    );

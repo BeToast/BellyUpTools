@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelected } from "../SelectedContext";
-import { doc, collection, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../../shared/firebase";
 
 const StateToFirestore: React.FC = () => {
@@ -8,29 +8,21 @@ const StateToFirestore: React.FC = () => {
 
    const syncToFirestore = useCallback(async () => {
       const docRef = doc(db, "SeatingCharts", "devChart");
-      const stateCollection = collection(docRef, "State");
 
       console.log("Syncing state to Firestore", assignedState);
 
-      for (const [key, value] of Object.entries(assignedState)) {
-         await setDoc(
-            doc(stateCollection, key),
-            {
-               assigned: value,
-            },
-            { merge: true }
-         );
+      try {
+         await setDoc(docRef, { state: assignedState }, { merge: true });
+         console.log("Write to Firestore complete");
+      } catch (error) {
+         console.error("Error writing to Firestore:", error);
       }
-
-      console.log("State sync to Firestore complete");
    }, [assignedState]);
 
    useEffect(() => {
       console.log(`assignedState changed, syncing to Firestore`);
       syncToFirestore();
    }, [assignedState, syncToFirestore]);
-
-   // console.log(`StateToFirestore component mounted`);
 
    return null;
 };
