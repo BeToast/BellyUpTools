@@ -1,3 +1,5 @@
+import stringify from "json-stable-stringify";
+
 export const arraysEqual = (a: string[], b: string[]) => {
    if (a === b) return true;
    if (a == null || b == null) return false;
@@ -25,4 +27,8 @@ export const arraysSameContents = (a: string[], b: string[]) => {
       if (!b.includes(el)) return false;
    });
    return true;
+};
+
+export const hashRecord = (record: Record<string, Array<string>>): string => {
+   return stringify(record);
 };

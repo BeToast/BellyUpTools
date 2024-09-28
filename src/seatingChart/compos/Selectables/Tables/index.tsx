@@ -17,6 +17,7 @@ const Tables = () => {
       bTables.map(() => React.createRef<HTMLDivElement>())
    );
 
+   // TODO: this can be updated to just have a hardcoded start state.
    useEffect(() => {
       kTables.forEach((id, index) => {
          setAssigned(`Table ${id}`, [], false, kTableRefs.current[index]);

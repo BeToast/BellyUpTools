@@ -55,9 +55,10 @@ const InfoBox: React.FC<{}> = ({}) => {
    useEffect(() => {
       //party ovverride boolean to populate parties when going from none selected
       if (partyOveride) {
-         selectedIds.forEach((id) => {
-            setAssigned(id, parties);
-         });
+         // selectedIds.forEach((id) => {
+         //    setAssigned(id, parties);
+         // });
+         setAssigned(selectedIds, parties);
       } else {
          if (selectedCount > 0) {
             setParties(state[selectedIds[0]].assigned);

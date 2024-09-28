@@ -42,6 +42,7 @@ const Seats = () => {
       return () => unsubscribe();
    }, []);
 
+   // TODO: this can be updated to just have a hardcoded start state.
    useEffect(() => {
       if (isFirstRender.current) {
          kSeats.forEach((id, index) => {

@@ -9,6 +9,7 @@ import PrintButton from "./compos/PrintButton";
 import Seats from "./compos/Selectables/Seats";
 import Tables from "./compos/Selectables/Tables";
 import { SelectedProvider } from "./context/SelectedContext";
+import StateToFirestore from "./context/stateToFirestore";
 
 function App() {
    return (
@@ -26,6 +27,8 @@ function App() {
                <div className="pixels200" />
                <InfoContext />
             </div>
+
+            <StateToFirestore />
          </SelectedProvider>
       </>
    );

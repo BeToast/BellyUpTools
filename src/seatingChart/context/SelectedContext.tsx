@@ -5,7 +5,12 @@ import React, {
    useCallback,
    useEffect,
 } from "react";
-import { arraysEqual, isArrayInArrayOfArrays } from "../utils/generic";
+import {
+   arraysEqual,
+   arraysSameContents,
+   hashRecord,
+   isArrayInArrayOfArrays,
+} from "../utils/generic";
 export interface recordValue {
    selected: boolean;
    assigned: Array<string>;
@@ -14,9 +19,13 @@ export interface recordValue {
 
 interface SelectedContextType {
    state: Record<string, recordValue>;
+   setState: React.Dispatch<React.SetStateAction<Record<string, recordValue>>>;
    selectedIds: Array<string>;
    unlinkedPartiesArray: Array<Array<Array<string>>>;
    partyLinks: Array<Array<Array<string>>>;
+   setPartyLinks: React.Dispatch<
+      React.SetStateAction<Array<Array<Array<string>>>>
+   >;
    parties: Array<string>;
    setParties: (parties: Array<string>) => void;
    partyOveride: boolean;
@@ -28,7 +37,7 @@ interface SelectedContextType {
    selectGroup: (id: string) => void;
    deselectAll: () => void;
    setAssigned: (
-      id: string,
+      ids: string | string[],
       assigned: Array<string>,
       selected?: boolean,
       ref?: React.RefObject<HTMLDivElement>
@@ -39,13 +48,17 @@ interface SelectedContextType {
       thisParty: Array<string>,
       index?: number
    ) => Array<string> | undefined;
+   assignedState: Record<string, Array<string>>;
+   prevAssignedStateHash: string;
 }
 
 const SelectedContext = createContext<SelectedContextType>({
    state: {},
+   setState: () => {},
    selectedIds: [],
    unlinkedPartiesArray: [],
    partyLinks: [],
+   setPartyLinks: () => {},
    parties: [],
    setParties: () => {},
    partyOveride: true,
@@ -59,6 +72,8 @@ const SelectedContext = createContext<SelectedContextType>({
    removeAssigned: () => {},
    addPartyLink: () => {},
    removePartyLink: () => undefined,
+   assignedState: {},
+   prevAssignedStateHash: "",
 });
 
 interface SelectedProviderProps {
@@ -92,6 +107,33 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
    //when setPartyOverride is true, then whatever parties are in the InfoBox state will be assigned to the clicked selectable
    const [partyOveride, setPartyOveride] = useState<boolean>(false);
    const [extraChairs, setExtraChairs] = useState<number>(0);
+
+   const [assignedState, setAssignedState] = useState<
+      Record<string, Array<string>>
+   >({});
+   const [prevAssignedStateHash, setPrevAssignedStateHash] =
+      useState<string>("");
+
+   //this is to set assignedState when nessicary for firebase syncing
+   useEffect(() => {
+      // Compute the new assigned state
+      const newAssignedState: Record<string, Array<string>> = {};
+
+      for (const [key, value] of Object.entries(state)) {
+         if (value.assigned) {
+            newAssignedState[key] = value.assigned;
+         }
+      }
+
+      // Hash the new state
+      const newStateHash = hashRecord(newAssignedState);
+
+      // If the hash is different, update the state
+      if (newStateHash !== prevAssignedStateHash) {
+         setAssignedState(newAssignedState);
+         setPrevAssignedStateHash(newStateHash);
+      }
+   }, [state]);
 
    const updateUnlinkedPartiesArray = useCallback(() => {
       // Flatten partyLinks into a single array of all linked parties
@@ -187,22 +229,26 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
    //sets the assigned value to the party array. and maybe a colour
    const setAssigned = useCallback(
       (
-         id: string,
+         ids: string | string[],
          newAssigned: Array<string>,
          newSelected?: boolean,
          newRef?: React.RefObject<HTMLDivElement>
       ) => {
-         // const isAssigned: boolean = newAssigned.length > 0;
+         setState((prev) => {
+            const updates: { [key: string]: any } = {};
+            const idArray = Array.isArray(ids) ? ids : [ids];
 
-         setState((prev) => ({
-            ...prev,
-            [id]: {
-               selected:
-                  newSelected !== undefined ? newSelected : prev[id].selected,
-               assigned: [...newAssigned],
-               ref: newRef !== undefined ? newRef : prev[id].ref,
-            },
-         }));
+            idArray.forEach((id) => {
+               updates[id] = {
+                  ...prev[id],
+                  assigned: [...newAssigned],
+                  ...(newSelected !== undefined && { selected: newSelected }),
+                  ...(newRef !== undefined && { ref: newRef }),
+               };
+            });
+
+            return { ...prev, ...updates };
+         });
       },
       []
    );
@@ -340,9 +386,11 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
 
    const value: SelectedContextType = {
       state,
+      setState,
       selectedIds,
       unlinkedPartiesArray,
       partyLinks,
+      setPartyLinks,
       parties,
       setParties,
       partyOveride,
@@ -356,6 +404,8 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
       removeAssigned,
       addPartyLink,
       removePartyLink,
+      assignedState,
+      prevAssignedStateHash,
    };
 
    return (
