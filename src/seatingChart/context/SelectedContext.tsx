@@ -4,23 +4,31 @@ import React, {
    useState,
    useCallback,
    useEffect,
+   useRef,
 } from "react";
 import {
    arraysEqual,
-   arraysSameContents,
+   hash,
    hashRecord,
    isArrayInArrayOfArrays,
 } from "../utils/generic";
-export interface recordValue {
+import { DocumentReference, onSnapshot } from "firebase/firestore";
+import {
+   convertFirebaseDataToInputsState,
+   InputsState,
+} from "../compos/Inputs";
+export interface RecordValue {
    selected: boolean;
    assigned: Array<string>;
    ref: React.RefObject<HTMLDivElement>;
 }
 
 interface SelectedContextType {
-   state: Record<string, recordValue>;
-   setState: React.Dispatch<React.SetStateAction<Record<string, recordValue>>>;
+   state: Record<string, RecordValue>;
+   setState: React.Dispatch<React.SetStateAction<Record<string, RecordValue>>>;
    selectedIds: Array<string>;
+   extraChairs: number;
+   setExtraChairs: React.Dispatch<React.SetStateAction<number>>;
    unlinkedPartiesArray: Array<Array<Array<string>>>;
    partyLinks: Array<Array<Array<string>>>;
    setPartyLinks: React.Dispatch<
@@ -29,8 +37,6 @@ interface SelectedContextType {
    parties: Array<string>;
    setParties: (parties: Array<string>) => void;
    partyOveride: boolean;
-   extraChairs: number;
-   setExtraChairs: (extraChairs: number) => void;
    setPartyOveride: (partyOveride: boolean) => void;
    // setVacant: (id: string) => void;
    setSelected: (id: string, selected: boolean) => void;
@@ -50,20 +56,28 @@ interface SelectedContextType {
    ) => Array<string> | undefined;
    assignedState: Record<string, Array<string>>;
    prevAssignedStateHash: string;
+   docRef: DocumentReference;
+   docInputs: InputsState | undefined;
+   setDocInputs: React.Dispatch<React.SetStateAction<InputsState | undefined>>;
+   docState: [string, string[]][] | undefined;
+   setDocState: React.Dispatch<
+      React.SetStateAction<[string, string[]][] | undefined>
+   >;
+   firestoreLoaded: boolean;
 }
 
 const SelectedContext = createContext<SelectedContextType>({
    state: {},
    setState: () => {},
    selectedIds: [],
+   extraChairs: 0,
+   setExtraChairs: () => {},
    unlinkedPartiesArray: [],
    partyLinks: [],
    setPartyLinks: () => {},
    parties: [],
    setParties: () => {},
    partyOveride: true,
-   extraChairs: 0,
-   setExtraChairs: () => {},
    setPartyOveride: () => {},
    setSelected: () => {},
    selectGroup: () => {},
@@ -74,16 +88,94 @@ const SelectedContext = createContext<SelectedContextType>({
    removePartyLink: () => undefined,
    assignedState: {},
    prevAssignedStateHash: "",
+   docRef: {} as DocumentReference,
+   docState: undefined,
+   setDocState: () => {},
+   docInputs: undefined,
+   setDocInputs: () => {},
+   firestoreLoaded: false,
 });
 
-interface SelectedProviderProps {
+export const SelectedProvider: React.FC<{
+   docRef: DocumentReference;
    children: React.ReactNode;
-}
+}> = ({ docRef, children }) => {
+   const [docInputs, setDocInputs] = useState<InputsState | undefined>(
+      undefined
+   );
+   const [docState, setDocState] = useState<[string, string[]][] | undefined>(
+      undefined
+   );
 
-export const SelectedProvider: React.FC<SelectedProviderProps> = ({
-   children,
-}) => {
-   const [state, setState] = useState<Record<string, recordValue>>({});
+   const [firestoreLoaded, setFirestoreLoaded] = useState<boolean>(false);
+
+   const prevHashRef = useRef({
+      inputs: 0,
+      kSeats: 0,
+      state: 0,
+   });
+
+   useEffect(() => {
+      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+         if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            if (data) {
+               if (data.inputs) {
+                  const newInputs = convertFirebaseDataToInputsState(
+                     data.inputs
+                  );
+                  const newHash = hash(newInputs);
+                  if (newHash !== prevHashRef.current.inputs) {
+                     setDocInputs(newInputs);
+                     prevHashRef.current.inputs = newHash;
+                  }
+               }
+
+               if (data.state) {
+                  const newState = Object.entries(data.state).filter(
+                     ([_, value]) => Array.isArray(value)
+                  ) as [string, string[]][];
+                  const newHash = hash(newState);
+                  if (newHash !== prevHashRef.current.state) {
+                     setDocState(newState);
+                     prevHashRef.current.state = newHash;
+                  }
+               }
+            }
+         }
+      });
+
+      return () => unsubscribe();
+   }, [docRef]);
+
+   useEffect(() => {
+      if (!docState) return;
+
+      console.log("Processing updated docState");
+
+      setState((prevState) => {
+         const newState: Record<string, RecordValue> = { ...prevState };
+
+         docState.forEach(([id, assigned]) => {
+            newState[id] = {
+               ...prevState[id], // Preserve existing properties
+               assigned,
+               selected: prevState[id]?.selected ?? false,
+               ref: prevState[id]?.ref ?? React.createRef<HTMLDivElement>(),
+            };
+         });
+
+         console.log("Updating local state with processed docState");
+         return newState;
+      });
+      setFirestoreLoaded(true);
+   }, [docState]);
+
+   // const getDocRef = useCallback(() => {
+   //    return doc(chartCollection, chartId)
+   // }, [chartCollection, chartId]);
+
+   const [state, setState] = useState<Record<string, RecordValue>>({});
 
    const [selectedIds, setSelectedIds] = useState<Array<string>>([]);
 
@@ -92,6 +184,8 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
          setSelectedIds(Object.keys(state).filter((id) => state[id].selected)),
       [state]
    );
+
+   const [extraChairs, setExtraChairs] = useState<number>(0);
 
    const [unlinkedPartiesArray, setUnlinkedPartiesArray] = useState<
       Array<Array<Array<string>>>
@@ -106,7 +200,6 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
 
    //when setPartyOverride is true, then whatever parties are in the InfoBox state will be assigned to the clicked selectable
    const [partyOveride, setPartyOveride] = useState<boolean>(false);
-   const [extraChairs, setExtraChairs] = useState<number>(0);
 
    const [assignedState, setAssignedState] = useState<
       Record<string, Array<string>>
@@ -388,14 +481,14 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
       state,
       setState,
       selectedIds,
+      extraChairs,
+      setExtraChairs,
       unlinkedPartiesArray,
       partyLinks,
       setPartyLinks,
       parties,
       setParties,
       partyOveride,
-      extraChairs,
-      setExtraChairs,
       setPartyOveride,
       setSelected,
       selectGroup,
@@ -406,6 +499,12 @@ export const SelectedProvider: React.FC<SelectedProviderProps> = ({
       removePartyLink,
       assignedState,
       prevAssignedStateHash,
+      docRef,
+      docState,
+      setDocState,
+      docInputs,
+      setDocInputs,
+      firestoreLoaded,
    };
 
    return (

@@ -6,6 +6,10 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+
+    match /SeatingCharts/{document} {
+      allow read, write: if true;
+    }
     
     // Allow read and write access to the specific SeatingCharts document
     match /SeatingCharts/devChart {

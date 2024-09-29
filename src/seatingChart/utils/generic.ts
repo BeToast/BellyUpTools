@@ -32,3 +32,41 @@ export const arraysSameContents = (a: string[], b: string[]) => {
 export const hashRecord = (record: Record<string, Array<string>>): string => {
    return stringify(record);
 };
+
+export const isValidDate = (dateString: string): boolean => {
+   // Enhanced regex for basic format and range check
+   const dateRegex = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])-\d{4}$/;
+
+   if (!dateRegex.test(dateString)) {
+      return false;
+   }
+
+   // Additional checks for valid month and day
+   const [month, day, year] = dateString.split("-").map(Number);
+
+   // Check for months with 30 days
+   if ([4, 6, 9, 11].includes(month) && day > 30) {
+      return false;
+   }
+
+   // Check for February
+   if (month === 2) {
+      // Check for leap year
+      const isLeapYear =
+         (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+      if (day > (isLeapYear ? 29 : 28)) {
+         return false;
+      }
+   }
+
+   return true;
+};
+
+export const hash = (obj: any): number => {
+   return JSON.stringify(obj)
+      .split("")
+      .reduce((a, b) => {
+         a = (a << 5) - a + b.charCodeAt(0);
+         return a & a;
+      }, 0);
+};

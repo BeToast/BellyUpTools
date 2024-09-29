@@ -1,37 +1,53 @@
+import { useState } from "react";
+
 import "./App.css";
 import "../shared/firebase";
+
+import SelectChart from "./compos/SelectChart";
 
 import InfoBox from "./compos/InfoBox";
 import InfoContext from "./compos/InfoContext";
 import Inputs from "./compos/Inputs";
 import OverlayPrinter from "./compos/OverlayPrinter";
-import PrintButton from "./compos/PrintButton";
 import Seats from "./compos/Selectables/Seats";
 import Tables from "./compos/Selectables/Tables";
 import { SelectedProvider } from "./context/SelectedContext";
+
 import StateToFirestore from "./context/StateToFirestore";
-import FirestoreToState from "./context/FirestoreToState";
+// import FirestoreToState from "./context/FirestoreToState";
+import { seatingChartCollection } from "../shared/firebase";
+import { getChartIdFromUrl } from "./utils/chartUrl";
+import { doc } from "firebase/firestore";
 
 function App() {
+   const [chartId, setChartKey] = useState<string | null>(getChartIdFromUrl());
+
+   window.addEventListener("popstate", () => setChartKey(getChartIdFromUrl()));
+
    return (
       <>
-         <PrintButton />
-         <SelectedProvider>
-            <div id="flexie" className="flexie">
-               <InfoBox />
-               <main id="letter-paper" className="letter-paper">
-                  <Inputs />
-                  <Tables />
-                  <Seats />
-                  <OverlayPrinter />
-               </main>
-               <div className="pixels200" />
-               <InfoContext />
-            </div>
+         {chartId === null ? (
+            <SelectChart
+               chartCollection={seatingChartCollection}
+               setChartKey={setChartKey}
+            />
+         ) : (
+            <SelectedProvider docRef={doc(seatingChartCollection, chartId)}>
+               <div id="flexie" className="flexie">
+                  <InfoBox />
+                  <main id="letter-paper" className="letter-paper">
+                     <Inputs />
+                     <Tables />
+                     <Seats />
+                     <OverlayPrinter />
+                  </main>
+                  <div className="pixels200" />
+                  <InfoContext />
+               </div>
 
-            <StateToFirestore />
-            <FirestoreToState />
-         </SelectedProvider>
+               {/* <StateToFirestore /> */}
+            </SelectedProvider>
+         )}
       </>
    );
 }

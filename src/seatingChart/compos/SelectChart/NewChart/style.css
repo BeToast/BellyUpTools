@@ -1,0 +1,77 @@
+:root {
+   --grey-colour: #7f7f7f;
+}
+
+.input-group {
+   display: flex;
+   width: 100%;
+   padding-top: 4px;
+}
+
+.name-input,
+.date-input {
+   font-size: 18px;
+   padding: 8px;
+   background-color: rgb(239, 239, 239);
+   border: 1px solid #ccc;
+   box-sizing: border-box;
+   border-radius: 4px;
+   flex-grow: 1;
+   width: 100%;
+}
+
+/* Styles for date input placeholder */
+.date-input::placeholder {
+   color: var(--grey-colour);
+}
+
+.date-input.empty {
+   color: var(--grey-colour);
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+.date-input::-webkit-input-placeholder {
+   color: var(--grey-colour);
+}
+
+/* For Firefox */
+.date-input::-moz-placeholder {
+   color: var(--grey-colour);
+   opacity: 1;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+   opacity: 0.5;
+}
+
+form {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+}
+
+button[type="submit"] {
+   margin-top: 10px;
+   padding: 8px 16px;
+   background-color: #3490dc;
+   color: white;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+   font-size: 16px;
+}
+
+button[type="submit"]:hover {
+   background-color: #2779bd;
+}
+
+h2 {
+   margin-bottom: 15px;
+   font-size: 1.5rem;
+   font-weight: bold;
+}
+
+.error-message {
+   color: red;
+   margin-bottom: 10px;
+}

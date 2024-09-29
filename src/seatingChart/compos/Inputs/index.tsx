@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./style.css";
 import { useSelected } from "../../context/SelectedContext";
-import { db } from "../../../shared/firebase";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { DocumentData, setDoc } from "firebase/firestore";
 
-interface InputsState {
+export interface InputsState {
    show: string;
    date: string;
    doors: string;
@@ -15,9 +14,7 @@ interface InputsState {
 }
 
 const Inputs: React.FC = () => {
-   const { extraChairs } = useSelected();
-
-   const docRef = doc(db, "SeatingCharts", "devChart");
+   const { docInputs, extraChairs, docRef } = useSelected();
 
    const [inputs, setInputs] = useState<InputsState>({
       show: "",
@@ -40,15 +37,10 @@ const Inputs: React.FC = () => {
    const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
    useEffect(() => {
-      const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
-         if (docSnapshot.exists()) {
-            const data = docSnapshot.data();
-            setInputs(data.inputs || {});
-         }
-      });
-
-      return () => unsubscribe();
-   }, []);
+      if (docInputs) {
+         setInputs(docInputs);
+      }
+   }, [docInputs]);
 
    useEffect(() => {
       return () => {
@@ -201,3 +193,17 @@ const Inputs: React.FC = () => {
 };
 
 export default Inputs;
+
+export const convertFirebaseDataToInputsState = (
+   data: DocumentData
+): InputsState => {
+   return {
+      show: data.inputs?.show || "",
+      date: data.inputs?.date || "",
+      doors: data.inputs?.doors || "",
+      supportTime: data.inputs?.supportTime || "",
+      mainTime: data.inputs?.mainTime || "",
+      approxEnd: data.inputs?.approxEnd || "",
+      notes: data.inputs?.notes || "",
+   };
+};

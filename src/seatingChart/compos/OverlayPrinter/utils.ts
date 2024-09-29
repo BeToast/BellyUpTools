@@ -1,4 +1,4 @@
-import { recordValue } from "../../context/SelectedContext";
+import { RecordValue } from "../../context/SelectedContext";
 import { arraysEqual } from "../../utils/generic";
 
 export interface Lrtb {
@@ -19,7 +19,7 @@ export function getLrtb(elements: Element[]): Lrtb {
 }
 
 export function createAssignedElementsRecord(
-   state: Record<string, recordValue>
+   state: Record<string, RecordValue>
 ): Record<string, Array<Element>> {
    //make a set for each unique assigned value
    const uniqueAssigned = new Set<string>();

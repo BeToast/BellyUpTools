@@ -1,14 +1,11 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelected } from "../SelectedContext";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../../shared/firebase";
+import { setDoc } from "firebase/firestore";
 
 const StateToFirestore: React.FC = () => {
-   const { assignedState } = useSelected();
+   const { assignedState, docRef } = useSelected();
 
    const syncToFirestore = useCallback(async () => {
-      const docRef = doc(db, "SeatingCharts", "devChart");
-
       console.log("Syncing state to Firestore", assignedState);
 
       try {

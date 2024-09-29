@@ -1,7 +1,7 @@
-import { recordValue } from "../../context/SelectedContext";
+import { RecordValue } from "../../context/SelectedContext";
 
 export const getElementClass = (
-   elementState: recordValue | undefined
+   elementState: RecordValue | undefined
 ): string => {
    if (elementState) {
       if (elementState.selected) {
@@ -23,7 +23,7 @@ export enum SelectState {
    SELECTEDASSIGNED,
 }
 export const getElementSelectState = (
-   elementState: recordValue | undefined
+   elementState: RecordValue | undefined
 ): SelectState => {
    if (elementState) {
       if (elementState.selected) {
@@ -86,12 +86,12 @@ export const handleElementClick = (
 
 export const getAssignments = (
    id: string,
-   state: Record<string, recordValue>
+   state: Record<string, RecordValue>
 ): string[] => {
    return state[id].assigned;
 };
 export const getOtherSelectedAssignments = (
-   state: Record<string, recordValue>
+   state: Record<string, RecordValue>
 ): string[] => {
    const selectedId = Object.keys(state).find((id) => state[id].selected);
    //return assigned if another variable is selected
