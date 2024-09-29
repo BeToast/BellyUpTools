@@ -8,9 +8,6 @@ import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
 
 const Seats = () => {
-   const [kSeats, setKSeats] = useState<Array<number>>([]);
-   const bSeats = Array.from({ length: 14 }, (_, i) => 14 - i);
-
    const {
       state,
       setState,
@@ -23,6 +20,9 @@ const Seats = () => {
    if (!firestoreLoaded) {
       return null;
    }
+
+   const [kSeats, setKSeats] = useState<Array<number>>([]);
+   const bSeats = Array.from({ length: 14 }, (_, i) => 14 - i);
 
    const isFirstRender = useRef(true);
 
