@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
+import { onSnapshot, updateDoc, increment } from "firebase/firestore";
 
-import { db } from "../../../../shared/firebase";
 import AddSeat from "./AddSeat";
 import Seat from "./Seat";
 import RemoveSeat from "./RemoveSeat";
@@ -9,12 +8,21 @@ import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
 
 const Seats = () => {
-   const docRef = doc(db, "SeatingCharts", "devChart");
-
    const [kSeats, setKSeats] = useState<Array<number>>([]);
    const bSeats = Array.from({ length: 14 }, (_, i) => 14 - i);
 
-   const { state, setAssigned, setExtraChairs } = useSelected();
+   const {
+      state,
+      setState,
+      setAssigned,
+      setExtraChairs,
+      docRef,
+      firestoreLoaded,
+   } = useSelected();
+
+   if (!firestoreLoaded) {
+      return null;
+   }
 
    const isFirstRender = useRef(true);
 
@@ -42,27 +50,45 @@ const Seats = () => {
       return () => unsubscribe();
    }, []);
 
-   // TODO: this can be updated to just have a hardcoded start state.
+   //ASSIGN REFS TO SEATS
    useEffect(() => {
       if (isFirstRender.current) {
-         kSeats.forEach((id, index) => {
-            setAssigned(`Seat k${id}`, [], false, kSeatRefs.current[index]);
+         setState((prev) => {
+            const newState = { ...prev };
+
+            kSeats.forEach((id, index) => {
+               newState[`Seat k${id}`] = {
+                  ...newState[`Seat k${id}`],
+                  ref: kSeatRefs.current[index],
+               };
+            });
+
+            bSeats.forEach((id) => {
+               newState[`Seat b${id}`] = {
+                  ...newState[`Seat b${id}`],
+                  ref: bSeatRefs.current[14 - id],
+               };
+            });
+
+            return newState;
          });
-         bSeats.forEach((id) => {
-            setAssigned(`Seat b${id}`, [], false, bSeatRefs.current[14 - id]);
-         });
+
          isFirstRender.current = false;
       } else {
-         kSeats.forEach((id, index) => {
-            setAssigned(
-               `Seat k${id}`,
-               state[`Seat k${id}`]?.assigned || [],
-               state[`Seat k${id}`]?.selected || false,
-               kSeatRefs.current[index]
-            );
+         setState((prev) => {
+            const newState = { ...prev };
+
+            kSeats.forEach((id, index) => {
+               newState[`Seat k${id}`] = {
+                  ...newState[`Seat k${id}`],
+                  ref: kSeatRefs.current[index],
+               };
+            });
+
+            return newState;
          });
       }
-   }, [kSeats]);
+   }, [kSeats, bSeats]);
 
    const addKitchenSeatHandler = async () => {
       await updateDoc(docRef, {
