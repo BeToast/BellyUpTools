@@ -5,12 +5,20 @@ import Tooltip from "../../../Tooltip";
 import "./style.css";
 
 const RemoveSeat: React.FC = () => {
-   const { setState, extraChairs, setExtraChairs } = useSelected();
+   const { setState, extraChairs, setExtraChairs, setKeyToRemove } =
+      useSelected();
 
    const removeSeatHandler = () => {
       setExtraChairs(extraChairs - 1);
+      const removedKey = `Seat k${-1 * (extraChairs - 1)}`;
+      console.log(removedKey);
+      setKeyToRemove(removedKey);
       setState((prev) => {
-         delete prev[`Seat k${-1 * (extraChairs - 1)}`];
+         delete prev[removedKey];
+         // const { [removedKey]: removedSeat, ...rest } =
+         //    prev;
+
+         // Return the new object without the removed seat
          return prev;
       });
    };

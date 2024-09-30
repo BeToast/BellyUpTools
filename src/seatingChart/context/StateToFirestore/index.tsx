@@ -1,27 +1,57 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelected } from "../SelectedContext";
-import { setDoc } from "firebase/firestore";
+import {
+   setDoc,
+   deleteField,
+   writeBatch,
+   FieldValue,
+} from "firebase/firestore";
+import { db } from "../../../shared/firebase";
 
 const StateToFirestore: React.FC = () => {
-   const { assignedState, docRef, firestoreLoaded } = useSelected();
+   const {
+      assignedState,
+      keyToRemove,
+      setKeyToRemove,
+      docRef,
+      firestoreLoaded,
+   } = useSelected();
+   console.log("assignedState", assignedState);
 
    const syncToFirestore = useCallback(async () => {
-      // console.log("Syncing state to Firestore", assignedState);
+      if (!firestoreLoaded || !docRef) return;
+
+      const batch = writeBatch(db);
       try {
-         await setDoc(docRef, { state: assignedState }, { merge: true });
-         // console.log("Write to Firestore complete");
+         // Update the state
+         batch.set(docRef, { state: assignedState }, { merge: true });
+
+         console.log(`Attempting to remove key: state.${keyToRemove}`);
+         // Handle keyToRemove if it exists
+         if (keyToRemove) {
+            batch.update(docRef, {
+               [`state.${keyToRemove}`]: deleteField(),
+            });
+            setKeyToRemove(null); // Reset keyToRemove after handling
+         }
+
+         // Commit the batch
+         await batch.commit();
+         console.log("Write to Firestore complete");
       } catch (error) {
          console.error("Error writing to Firestore:", error);
       }
-   }, [assignedState]);
+   }, [assignedState, docRef, firestoreLoaded]);
 
    useEffect(() => {
       if (!firestoreLoaded) {
          return undefined;
       }
-      // console.log(`assignedState changed, syncing to Firestore`);
+      console.log(
+         `assignedState changed or keyToRemove set, syncing to Firestore`
+      );
       syncToFirestore();
-   }, [assignedState, syncToFirestore, firestoreLoaded]);
+   }, [assignedState, keyToRemove, syncToFirestore, firestoreLoaded]);
 
    return null;
 };
