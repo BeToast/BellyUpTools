@@ -9,34 +9,27 @@ import {
 import { db } from "../../../shared/firebase";
 
 const StateToFirestore: React.FC = () => {
-   const {
-      assignedState,
-      keyToRemove,
-      setKeyToRemove,
-      docRef,
-      firestoreLoaded,
-   } = useSelected();
-   console.log("assignedState", assignedState);
+   const { assignedState, docRef, firestoreLoaded } = useSelected();
 
    const syncToFirestore = useCallback(async () => {
       if (!firestoreLoaded || !docRef) return;
 
-      const batch = writeBatch(db);
+      // const batch = writeBatch(db);
       try {
          // Update the state
-         batch.set(docRef, { state: assignedState }, { merge: true });
+         // batch.set(docRef, { state: assignedState }, { merge: true });
+         setDoc(docRef, { state: assignedState }, { merge: true });
 
-         console.log(`Attempting to remove key: state.${keyToRemove}`);
          // Handle keyToRemove if it exists
-         if (keyToRemove) {
-            batch.update(docRef, {
-               [`state.${keyToRemove}`]: deleteField(),
-            });
-            setKeyToRemove(null); // Reset keyToRemove after handling
-         }
+         // if (keyToRemove) {
+         //    batch.update(docRef, {
+         //       [`state.${keyToRemove}`]: deleteField(),
+         //    });
+         //    setKeyToRemove(null); // Reset keyToRemove after handling
+         // }
 
-         // Commit the batch
-         await batch.commit();
+         // // Commit the batch
+         // await batch.commit();
          console.log("Write to Firestore complete");
       } catch (error) {
          console.error("Error writing to Firestore:", error);
@@ -51,7 +44,7 @@ const StateToFirestore: React.FC = () => {
          `assignedState changed or keyToRemove set, syncing to Firestore`
       );
       syncToFirestore();
-   }, [assignedState, keyToRemove, syncToFirestore, firestoreLoaded]);
+   }, [assignedState, syncToFirestore, firestoreLoaded]);
 
    return null;
 };

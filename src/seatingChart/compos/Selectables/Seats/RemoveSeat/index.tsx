@@ -3,21 +3,20 @@ import { useSelected } from "../../../../context/SelectedContext";
 import { xSvg } from "../../../../utils/svgs";
 import Tooltip from "../../../Tooltip";
 import "./style.css";
+import { deleteField, updateDoc } from "firebase/firestore";
 
 const RemoveSeat: React.FC = () => {
-   const { setState, extraChairs, setExtraChairs, setKeyToRemove } =
-      useSelected();
+   const { setState, extraChairs, setExtraChairs, docRef } = useSelected();
 
    const removeSeatHandler = () => {
       setExtraChairs(extraChairs - 1);
       const removedKey = `Seat k${-1 * (extraChairs - 1)}`;
-      console.log(removedKey);
-      setKeyToRemove(removedKey);
+      updateDoc(docRef, {
+         [`state.${removedKey}`]: deleteField(),
+      });
+
       setState((prev) => {
          delete prev[removedKey];
-         // const { [removedKey]: removedSeat, ...rest } =
-         //    prev;
-
          // Return the new object without the removed seat
          return prev;
       });

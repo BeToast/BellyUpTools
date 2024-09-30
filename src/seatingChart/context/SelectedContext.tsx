@@ -32,8 +32,6 @@ interface SelectedContextType {
    assignedElements: Record<string, Array<Element>>;
    extraChairs: number;
    setExtraChairs: React.Dispatch<React.SetStateAction<number>>;
-   keyToRemove: string | null;
-   setKeyToRemove: React.Dispatch<React.SetStateAction<string | null>>;
    unlinkedPartiesArray: Array<Array<Array<string>>>;
    partyLinks: Array<Array<Array<string>>>;
    setPartyLinks: React.Dispatch<
@@ -78,8 +76,6 @@ const SelectedContext = createContext<SelectedContextType>({
    assignedElements: {},
    extraChairs: 0,
    setExtraChairs: () => {},
-   keyToRemove: null,
-   setKeyToRemove: () => {},
    unlinkedPartiesArray: [],
    partyLinks: [],
    setPartyLinks: () => {},
@@ -507,8 +503,6 @@ export const SelectedProvider: React.FC<{
       assignedElements,
       extraChairs,
       setExtraChairs,
-      keyToRemove,
-      setKeyToRemove,
       unlinkedPartiesArray,
       partyLinks,
       setPartyLinks,
