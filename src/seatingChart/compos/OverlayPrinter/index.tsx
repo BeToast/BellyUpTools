@@ -6,7 +6,7 @@ import React, {
    useRef,
 } from "react";
 import { useSelected } from "../../context/SelectedContext";
-import { createAssignedElementsRecord, partyPound } from "./utils";
+import { partyPound } from "./utils";
 import NameAndLines from "./NameAndLines";
 
 const AbsolutePrinter: React.FC = () => {
@@ -15,7 +15,8 @@ const AbsolutePrinter: React.FC = () => {
    const [paperRect, setPaperRect] = useState<DOMRect | null>(null);
    const [flexieMargin, setFlexieMargin] = useState(0);
 
-   const { state, partyLinks } = useSelected();
+   const { partyLinks, assignedElements, firestoreLoaded } = useSelected();
+
    const paperRef = useRef<HTMLElement | null>(null);
 
    const updateScrollTopAndPaperSize = useCallback(() => {
@@ -55,10 +56,9 @@ const AbsolutePrinter: React.FC = () => {
       };
    }, [updateScrollTopAndPaperSize, updatePaperRect, updateFlexieMargin]);
 
-   const assignedElements = useMemo(
-      () => createAssignedElementsRecord(state),
-      [state]
-   );
+   if (!firestoreLoaded) {
+      return <></>;
+   }
 
    var partyLinksFlatPounded: Array<string> = [];
 
@@ -70,13 +70,10 @@ const AbsolutePrinter: React.FC = () => {
             const elementsArray: Array<Array<Element>> = [];
             parties.map((party) => {
                const partyPounded = partyPound(party);
-               // console.log(assignedElements[partyPound]);
                assignedArray.push(partyPounded);
                elementsArray.push(assignedElements[partyPounded]);
                partyLinksFlatPounded.push();
                // delete assignedElementsCopy[partyPound]; //TY SRINI - how do i remove an item from assignedElements??
-               // console.log(assignedElements.length);
-               // console.log(assignedElementsCopy.length);
             });
             //log what has been done already
             partyLinksFlatPounded = [
@@ -101,7 +98,6 @@ const AbsolutePrinter: React.FC = () => {
          })}
          {/* iterate through remainder of unlinked */}
          {Object.entries(assignedElements).map(([assigned, elements]) => {
-            // console.log(assigned);
             if (
                !partyLinksFlatPounded.some(
                   (partyPounded) => partyPounded == assigned

@@ -1,5 +1,6 @@
 import { seatingChartCollection } from "../../../../shared/firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { InputsState } from "../../Inputs";
 
 export const newChartDoc = async (
    show: string,
@@ -23,10 +24,20 @@ export const newChartDoc = async (
          state[`Table ${i}`] = [];
       }
 
-      const docData = {
+      const docData: {
+         inputs: InputsState;
+         state: {
+            [key: string]: string[];
+         };
+      } = {
          inputs: {
-            show,
-            date,
+            show: show,
+            date: date,
+            doors: "",
+            supportTime: "",
+            mainTime: "",
+            approxEnd: "",
+            notes: "",
          },
          state,
       };

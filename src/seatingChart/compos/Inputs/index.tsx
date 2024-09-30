@@ -16,15 +16,11 @@ export interface InputsState {
 const Inputs: React.FC = () => {
    const { docInputs, extraChairs, docRef } = useSelected();
 
-   const [inputs, setInputs] = useState<InputsState>({
-      show: "",
-      date: "",
-      doors: "",
-      supportTime: "",
-      mainTime: "",
-      approxEnd: "",
-      notes: "",
-   });
+   if (!docInputs) {
+      return null;
+   }
+
+   const [inputs, setInputs] = useState<InputsState>(docInputs);
 
    const showInputRef = useRef<HTMLInputElement>(null);
    const dateInputRef = useRef<HTMLInputElement>(null);
@@ -193,17 +189,3 @@ const Inputs: React.FC = () => {
 };
 
 export default Inputs;
-
-export const convertFirebaseDataToInputsState = (
-   data: DocumentData
-): InputsState => {
-   return {
-      show: data.inputs?.show || "",
-      date: data.inputs?.date || "",
-      doors: data.inputs?.doors || "",
-      supportTime: data.inputs?.supportTime || "",
-      mainTime: data.inputs?.mainTime || "",
-      approxEnd: data.inputs?.approxEnd || "",
-      notes: data.inputs?.notes || "",
-   };
-};

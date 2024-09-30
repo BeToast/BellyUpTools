@@ -13,10 +13,12 @@ import {
    isArrayInArrayOfArrays,
 } from "../utils/generic";
 import { DocumentReference, onSnapshot } from "firebase/firestore";
+import { InputsState } from "../compos/Inputs";
+import { createAssignedElementsRecord } from "../compos/OverlayPrinter/utils";
 import {
-   convertFirebaseDataToInputsState,
-   InputsState,
-} from "../compos/Inputs";
+   FlattenedPartyLink,
+   reconstructPartyLinks,
+} from "./PartyLinksToFirestore/utils";
 export interface RecordValue {
    selected: boolean;
    assigned: Array<string>;
@@ -27,6 +29,7 @@ interface SelectedContextType {
    state: Record<string, RecordValue>;
    setState: React.Dispatch<React.SetStateAction<Record<string, RecordValue>>>;
    selectedIds: Array<string>;
+   assignedElements: Record<string, Array<Element>>;
    extraChairs: number;
    setExtraChairs: React.Dispatch<React.SetStateAction<number>>;
    unlinkedPartiesArray: Array<Array<Array<string>>>;
@@ -70,6 +73,7 @@ const SelectedContext = createContext<SelectedContextType>({
    state: {},
    setState: () => {},
    selectedIds: [],
+   assignedElements: {},
    extraChairs: 0,
    setExtraChairs: () => {},
    unlinkedPartiesArray: [],
@@ -111,22 +115,20 @@ export const SelectedProvider: React.FC<{
 
    const prevHashRef = useRef({
       inputs: 0,
-      kSeats: 0,
       state: 0,
+      partyLinks: 0,
    });
 
    useEffect(() => {
       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+         console.log("Received doc snapshot");
          if (docSnapshot.exists()) {
             const data = docSnapshot.data();
             if (data) {
                if (data.inputs) {
-                  const newInputs = convertFirebaseDataToInputsState(
-                     data.inputs
-                  );
-                  const newHash = hash(newInputs);
+                  const newHash = hash(data.inputs);
                   if (newHash !== prevHashRef.current.inputs) {
-                     setDocInputs(newInputs);
+                     setDocInputs(data.inputs);
                      prevHashRef.current.inputs = newHash;
                   }
                }
@@ -141,6 +143,18 @@ export const SelectedProvider: React.FC<{
                      prevHashRef.current.state = newHash;
                   }
                   setExtraChairs(newState.length - 42);
+               }
+
+               if (data.partyLinks) {
+                  const flattenedLinks =
+                     data.partyLinks as FlattenedPartyLink[];
+                  const reconstructedLinks =
+                     reconstructPartyLinks(flattenedLinks);
+                  const newHash = hash(reconstructedLinks);
+                  if (newHash !== prevHashRef.current.partyLinks) {
+                     setPartyLinks(reconstructedLinks);
+                     prevHashRef.current.partyLinks = newHash;
+                  }
                }
             }
          }
@@ -179,12 +193,14 @@ export const SelectedProvider: React.FC<{
    const [state, setState] = useState<Record<string, RecordValue>>({});
 
    const [selectedIds, setSelectedIds] = useState<Array<string>>([]);
+   const [assignedElements, setAssignedElements] = useState<
+      Record<string, Array<Element>>
+   >({});
 
-   useEffect(
-      () =>
-         setSelectedIds(Object.keys(state).filter((id) => state[id].selected)),
-      [state]
-   );
+   useEffect(() => {
+      setSelectedIds(Object.keys(state).filter((id) => state[id].selected));
+      setAssignedElements(createAssignedElementsRecord(state));
+   }, [state]);
 
    const [extraChairs, setExtraChairs] = useState<number>(0);
 
@@ -482,6 +498,7 @@ export const SelectedProvider: React.FC<{
       state,
       setState,
       selectedIds,
+      assignedElements,
       extraChairs,
       setExtraChairs,
       unlinkedPartiesArray,

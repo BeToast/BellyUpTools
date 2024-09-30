@@ -18,6 +18,7 @@ import StateToFirestore from "./context/StateToFirestore";
 import { seatingChartCollection } from "../shared/firebase";
 import { getChartIdFromUrl } from "./utils/chartUrl";
 import { doc } from "firebase/firestore";
+import PartyLinksToFirestore from "./context/PartyLinksToFirestore";
 
 function App() {
    const [chartId, setChartKey] = useState<string | null>(getChartIdFromUrl());
@@ -45,7 +46,8 @@ function App() {
                   <InfoContext />
                </div>
 
-               {/* <StateToFirestore /> */}
+               <StateToFirestore />
+               <PartyLinksToFirestore />
             </SelectedProvider>
          )}
       </>

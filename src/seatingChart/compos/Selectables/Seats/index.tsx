@@ -39,7 +39,7 @@ const Seats = () => {
       );
    }
    var bSeatsEls: Array<React.ReactNode> = [];
-   var bId = 1;
+   var bId = 14;
    while (state[`Seat b${bId}`]) {
       bSeatsEls.push(
          <React.Fragment key={bId}>
@@ -50,7 +50,7 @@ const Seats = () => {
             />
          </React.Fragment>
       );
-      bId++;
+      bId--;
    }
 
    return (
