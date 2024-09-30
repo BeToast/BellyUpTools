@@ -140,6 +140,7 @@ export const SelectedProvider: React.FC<{
                      setDocState(newState);
                      prevHashRef.current.state = newHash;
                   }
+                  setExtraChairs(newState.length - 42);
                }
             }
          }

@@ -1,38 +1,18 @@
 import React from "react";
-import { DocumentReference, updateDoc, increment } from "firebase/firestore";
 import { useSelected } from "../../../../context/SelectedContext";
 import { xSvg } from "../../../../utils/svgs";
 import Tooltip from "../../../Tooltip";
 import "./style.css";
 
-interface RemoveSeatProps {
-   kSeats: number[];
-   setKSeats: React.Dispatch<React.SetStateAction<number[]>>;
-   docRef: DocumentReference;
-}
+const RemoveSeat: React.FC = () => {
+   const { setState, extraChairs, setExtraChairs } = useSelected();
 
-const RemoveSeat: React.FC<RemoveSeatProps> = ({
-   kSeats,
-   setKSeats,
-   docRef,
-}) => {
-   const { setAssigned } = useSelected();
-
-   const removeSeatHandler = async () => {
-      if (kSeats.length <= 16) return; // Don't remove if we're at or below the initial seat count
-
-      // Find the seat to remove (the one with the lowest number, which is at the start of the array)
-      const seatToRemove = kSeats[0];
-
-      // Update Firestore
-      await updateDoc(docRef, {
-         kSeats: increment(-1),
+   const removeSeatHandler = () => {
+      setExtraChairs(extraChairs - 1);
+      setState((prev) => {
+         delete prev[`Seat k${-1 * (extraChairs - 1)}`];
+         return prev;
       });
-
-      // Remove the assignment for the removed seat
-      setAssigned(`Seat k${seatToRemove}`, [], false);
-
-      // No need to shift assignments as seats  are now numbered independently
    };
 
    return (

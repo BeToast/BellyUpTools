@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { onSnapshot, updateDoc, increment } from "firebase/firestore";
+import React from "react";
 
 import AddSeat from "./AddSeat";
 import Seat from "./Seat";
@@ -8,27 +7,16 @@ import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
 
 const Seats = () => {
-   const {
-      state,
-      extraChairs,
-      setExtraChairs,
-      // setState,
-      setAssigned,
-      // docRef,
-      firestoreLoaded,
-   } = useSelected();
+   const { state, extraChairs, setExtraChairs, setAssigned, firestoreLoaded } =
+      useSelected();
 
    if (!firestoreLoaded) {
       return null;
    }
-   // let extraChairs = kSeats.length - 16;
-   // if (extraChairs > -1) {
-   //    setDocExtraChairs(extraChairs);
-   // }
 
-   const addKitchenSeatHandler = async () => {
+   const addKitchenSeatHandler = () => {
       setAssigned(
-         `Seat k${17 + extraChairs}`,
+         `Seat k${-1 * extraChairs}`,
          [],
          false,
          React.createRef<HTMLDivElement>()
@@ -38,7 +26,6 @@ const Seats = () => {
 
    var kSeatsEls: Array<React.ReactNode> = [];
    for (var kId = 1 - extraChairs; kId < 17; kId++) {
-      console.log(kId);
       // console.log(state[`Seat k${kId}`]);
       kSeatsEls.push(
          <React.Fragment key={kId}>
@@ -47,15 +34,7 @@ const Seats = () => {
                displayNumber={kId + extraChairs}
                ref={state[`Seat k${kId}`].ref}
             />
-            {kId < 1 && (
-               <></>
-               //TODO add remove seat
-               // <RemoveSeat
-               //    kSeats={kSeats}
-               //    setKSeats={setKSeats}
-               //    docRef={docRef}
-               // />
-            )}
+            {kId < 1 && <RemoveSeat />}
          </React.Fragment>
       );
    }

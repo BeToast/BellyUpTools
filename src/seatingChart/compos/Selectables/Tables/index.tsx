@@ -7,34 +7,20 @@ const Tables = () => {
    const kTables: Array<number> = [10, 11, 12, 13, 14, 15];
    const bTables: Array<number> = [16, 17, 18, 19, 20, 21];
 
-   const { setAssigned } = useSelected();
+   const { state, firestoreLoaded } = useSelected();
 
-   // Create refs for all tables
-   const kTableRefs = useRef(
-      kTables.map(() => React.createRef<HTMLDivElement>())
-   );
-   const bTableRefs = useRef(
-      bTables.map(() => React.createRef<HTMLDivElement>())
-   );
-
-   // TODO: this can be updated to just have a hardcoded start state.
-   useEffect(() => {
-      kTables.forEach((id, index) => {
-         setAssigned(`Table ${id}`, [], false, kTableRefs.current[index]);
-      });
-      bTables.forEach((id, index) => {
-         setAssigned(`Table ${id}`, [], false, bTableRefs.current[index]);
-      });
-   }, []);
+   if (!firestoreLoaded) {
+      return null;
+   }
 
    return (
       <div className="table-col">
-         {kTables.map((num, index) => (
-            <Table key={num} id={num} ref={kTableRefs.current[index]} />
+         {kTables.map((num) => (
+            <Table key={num} id={num} ref={state[`Table ${num}`].ref} />
          ))}
          <div className="table-row">
-            {bTables.map((num, index) => (
-               <Table key={num} id={num} ref={bTableRefs.current[index]} />
+            {bTables.map((num) => (
+               <Table key={num} id={num} ref={state[`Table ${num}`].ref} />
             ))}
          </div>
       </div>
