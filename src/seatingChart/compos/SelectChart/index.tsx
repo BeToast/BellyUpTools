@@ -1,7 +1,10 @@
+import "./style.css";
+
 import React, { useEffect, useState } from "react";
 import { CollectionReference, getDocs } from "firebase/firestore";
 import { addChartToUrl } from "../../utils/chartUrl";
 import NewChart from "./NewChart";
+import ChartLink from "./ChartLink";
 
 const SelectChart: React.FC<{
    chartCollection: CollectionReference;
@@ -38,19 +41,29 @@ const SelectChart: React.FC<{
 
    return (
       <>
-         <h1>Choose a chart</h1>
-         <NewChart handleChartSelect={handleChartSelect} />
-         {chartIds.length > 0 ? (
-            <ul>
-               {chartIds.map((id) => (
-                  <li key={id}>
-                     <button onClick={() => handleChartSelect(id)}>{id}</button>
-                  </li>
-               ))}
-            </ul>
-         ) : (
-            <p>No charts available.</p>
-         )}
+         <div className="horz-center">
+            <div className="vert-flex">
+               <div className="chart-select-header">
+                  <h1>Choose a chart</h1>
+                  <NewChart handleChartSelect={handleChartSelect} />
+               </div>
+               <div className="chart-card-flex">
+                  {chartIds.length > 0 ? (
+                     <>
+                        {chartIds.map((id) => (
+                           <ChartLink
+                              // key={id}
+                              name={id}
+                              onClickHandler={() => handleChartSelect(id)}
+                           />
+                        ))}
+                     </>
+                  ) : (
+                     <p>No charts available.</p>
+                  )}
+               </div>
+            </div>
+         </div>
       </>
    );
 };

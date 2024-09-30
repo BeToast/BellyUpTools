@@ -1,0 +1,33 @@
+.chart-card {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   gap: 8px;
+   background-color: #e6f0ff;
+   border-radius: 8px;
+   padding: 12px 20px 12px 20px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   transition: all 0.3s;
+   margin-right: 28px;
+
+   cursor: pointer;
+}
+.chart-arrow-right {
+   display: flex;
+   justify-content: center;
+   width: 16px;
+   fill: transparent;
+   transition: all 0.3s;
+}
+
+.chart-card:hover {
+   margin-left: 28px;
+   margin-right: 0px;
+   background-color: #2a5dab;
+}
+.chart-card:hover > h3 {
+   color: #f4f9ff;
+}
+.chart-card:hover > .chart-arrow-right {
+   fill: #f4f9ff;
+}

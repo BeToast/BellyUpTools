@@ -1,0 +1,11 @@
+.chart-select-header {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+}
+
+.chart-card-flex {
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+}

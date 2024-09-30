@@ -1,11 +1,11 @@
-import "./App.css";
+// import "./App.css";
 import ToolLink from "./compos/ToolLink";
 
 function App() {
    return (
       <div className="horz-center">
-         <div className="App">
-            <div className="title-card">
+         <div className="vert-flex">
+            <div>
                <h1>Welcome to BellyUpTools</h1>
             </div>
             <ToolLink name={"Report Tools 📄"} href={"/reportTools/"} />

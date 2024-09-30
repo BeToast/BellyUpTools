@@ -64,7 +64,9 @@ const NewChart: React.FC<{
 
    return (
       <>
-         <button onClick={createChartHandler}>New Seating Chart</button>
+         <div className="new-chart-button" onClick={createChartHandler}>
+            New Seating Chart
+         </div>
          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
             <h2>Create New Seating Chart</h2>
             <form onSubmit={handleSubmit}>

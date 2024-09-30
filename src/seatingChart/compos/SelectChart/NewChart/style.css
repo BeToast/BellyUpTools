@@ -2,6 +2,28 @@
    --grey-colour: #7f7f7f;
 }
 
+.new-chart-button {
+   margin-right: 28px;
+   padding: 12px 20px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   font-weight: 500;
+
+   color: rgb(239, 239, 239);
+   background-color: #2a5dab;
+   border-radius: 8px;
+   cursor: pointer;
+
+   transition: all 0.3s;
+}
+.new-chart-button:hover {
+   color: rgb(255, 255, 255);
+   background-color: #5086d7;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .input-group {
    display: flex;
    width: 100%;
@@ -53,20 +75,24 @@ form {
 button[type="submit"] {
    margin-top: 10px;
    padding: 8px 16px;
-   background-color: #3490dc;
-   color: white;
+   color: rgb(239, 239, 239);
+   background-color: #2a5dab;
    border: none;
    border-radius: 4px;
    cursor: pointer;
    font-size: 16px;
+   transition: all 0.3s;
 }
 
 button[type="submit"]:hover {
-   background-color: #2779bd;
+   color: rgb(255, 255, 255);
+   background-color: #5086d7;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
    margin-bottom: 15px;
+   padding-bottom: 8px;
    font-size: 1.5rem;
    font-weight: bold;
 }
