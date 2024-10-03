@@ -74,7 +74,7 @@ const NewChart: React.FC<{
                <div className="input-group">
                   <input
                      type="text"
-                     className="name-input"
+                     className="name-input-n"
                      placeholder="Show name"
                      value={showName}
                      onChange={(e) => setShowName(e.target.value)}
@@ -83,7 +83,7 @@ const NewChart: React.FC<{
                <div className="input-group">
                   <input
                      type="date"
-                     className={`date-input ${!date ? "empty" : ""}`}
+                     className={`date-input-n ${!date ? "empty" : ""}`}
                      value={date}
                      onChange={handleDateChange}
                   />

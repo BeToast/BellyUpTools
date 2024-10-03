@@ -3,7 +3,6 @@
 }
 
 .new-chart-button {
-   margin-right: 28px;
    padding: 12px 20px;
    display: flex;
    justify-content: center;
@@ -13,14 +12,17 @@
 
    color: rgb(239, 239, 239);
    background-color: #2a5dab;
+   border: 1px solid transparent;
    border-radius: 8px;
    cursor: pointer;
 
    transition: all 0.3s;
 }
+
 .new-chart-button:hover {
-   color: rgb(255, 255, 255);
-   background-color: #5086d7;
+   color: #07234d;
+   background-color: #c3d1e8;
+   border: 1px solid #07234d;
    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -30,8 +32,8 @@
    padding-top: 4px;
 }
 
-.name-input,
-.date-input {
+.name-input-n,
+.date-input-n {
    font-size: 18px;
    padding: 8px;
    background-color: rgb(239, 239, 239);

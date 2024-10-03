@@ -52,7 +52,7 @@ const SelectChart: React.FC<{
                      <>
                         {chartIds.map((id) => (
                            <ChartLink
-                              // key={id}
+                              key={id}
                               name={id}
                               onClickHandler={() => handleChartSelect(id)}
                            />

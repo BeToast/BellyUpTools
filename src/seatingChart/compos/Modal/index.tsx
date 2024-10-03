@@ -4,7 +4,7 @@ import "./style.css";
 const Modal: React.FC<{
    children: ReactNode;
    isOpen: boolean;
-   onClose: () => void;
+   onClose: (e: React.MouseEvent) => void;
 }> = ({ children, isOpen, onClose }) => {
    if (!isOpen) return null;
 

@@ -8,26 +8,52 @@
    padding: 12px 20px 12px 20px;
    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
    transition: all 0.3s;
-   margin-right: 28px;
 
    cursor: pointer;
 }
-.chart-arrow-right {
+
+.chart-icon {
+   padding: 6px;
+   border-radius: 4px;
+   background-color: transparent;
+   width: 20px;
    display: flex;
    justify-content: center;
-   width: 16px;
-   fill: transparent;
-   transition: all 0.3s;
+   transition: background-color 0.2s;
 }
 
-.chart-card:hover {
-   margin-left: 28px;
-   margin-right: 0px;
+/* .chart-arrow-right {
+   fill: transparent; */
+/* transition: all 0.3s;
+} */
+.chart-card-buttons {
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   align-items: center;
+   gap: 18px;
+   fill: transparent;
+}
+
+.chart-card-wrapper:hover > .chart-card {
    background-color: #2a5dab;
 }
-.chart-card:hover > h3 {
+
+.chart-card-wrapper:hover > .chart-card > h3 {
    color: #f4f9ff;
 }
-.chart-card:hover > .chart-arrow-right {
+/* .chart-card-wrapper:hover > .chart-card > .chart-arrow-right {
    fill: #f4f9ff;
+} */
+
+.chart-card-wrapper:hover > .chart-card > .chart-card-buttons {
+   fill: #f4f9ff;
+   stroke: #f4f9ff;
+}
+
+.chart-icon:hover {
+   background-color: #f4f9ff;
+   --stroke-fill: #0e396d;
+   fill: var(--stroke-fill);
+   stroke: var(--stroke-fill);
 }

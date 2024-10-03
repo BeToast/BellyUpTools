@@ -1,0 +1,33 @@
+.rename-chart {
+   padding-left: 7px;
+   padding-right: 5px;
+}
+
+.vert-flex-no-pad {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: left;
+   padding: 0;
+}
+
+.rename-button {
+   font-size: 16px;
+   font-weight: 500;
+   margin-top: 16px;
+   background-color: #2a5dab;
+   text-align: center;
+   border-radius: 8px;
+   border: 1px solid transparent;
+
+   color: rgb(239, 239, 239);
+   padding: 10px 12px;
+   transition: all 0.3s;
+   cursor: pointer;
+}
+.rename-button:hover {
+   background-color: #c3d1e8;
+   color: #07234d;
+   border: 1px solid #07234d;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
