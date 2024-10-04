@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { collection, Firestore, getFirestore } from "firebase/firestore";
+import { OAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,3 +19,5 @@ const firebaseConfig = {
 const app: FirebaseApp = initializeApp(firebaseConfig);
 export const db: Firestore = getFirestore();
 export const seatingChartCollection = collection(db, "SeatingCharts");
+
+export const providerMicrosoft = new OAuthProvider("microsoft.com");
