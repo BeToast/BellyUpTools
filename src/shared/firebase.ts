@@ -20,4 +20,10 @@ const app: FirebaseApp = initializeApp(firebaseConfig);
 export const db: Firestore = getFirestore();
 export const seatingChartCollection = collection(db, "SeatingCharts");
 
-export const providerMicrosoft = new OAuthProvider("microsoft.com");
+export const providerMicrosoft = (() => {
+   var provider = new OAuthProvider("microsoft.com");
+   provider.setCustomParameters({
+      tenant: "bellyupaspen.com",
+   });
+   return provider;
+})();

@@ -28,12 +28,12 @@ function App() {
       token: string;
       timestamp: number;
    } | null = localStorageStr ? JSON.parse(localStorageStr) : null;
-   const tokenExpired =
-      localStorageObj === null ||
-      new Date().getTime() - localStorageObj.timestamp > 1209600; //this is two weeks
    // const tokenExpired =
    //    localStorageObj === null ||
    //    new Date().getTime() - localStorageObj.timestamp > 1209600; //this is two weeks
+   const tokenExpired =
+      localStorageObj === null ||
+      new Date().getTime() - localStorageObj.timestamp > 1; //this is two weeks
 
    //stored token is set if its not experied and if it is not null
    const [storedToken, setStoredToken] = useState<string | null>(
