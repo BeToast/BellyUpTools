@@ -1,0 +1,16 @@
+.writing-status {
+   width: 100%;
+   border: 1px solid #ccc;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   border-radius: 8px;
+   color: black;
+}
+.writing-status.saved {
+   background-color: rgb(209, 247, 211);
+}
+.writing-status.writing {
+   background-color: #f7e864;
+}
+.writing-status-content {
+   padding: 12px 16px;
+}

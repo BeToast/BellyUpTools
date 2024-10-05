@@ -4,18 +4,26 @@ import { setDoc } from "firebase/firestore";
 import { flattenPartyLinks, PartyLinks } from "./utils";
 
 const PartyLinksToFirestore: React.FC = () => {
-   const { partyLinks, docRef, firestoreLoaded } = useSelected();
+   const { partyLinks, docRef, firestoreLoaded, setWriting } = useSelected();
 
    const syncPartyLinksToFirestore = useCallback(async () => {
       // console.log("Syncing partyLinks to Firestore", partyLinks);
 
-      try {
-         const flattenedLinks = flattenPartyLinks(partyLinks as PartyLinks);
-         await setDoc(docRef, { partyLinks: flattenedLinks }, { merge: true });
-         // console.log("PartyLinks sync to Firestore complete");
-      } catch (error) {
-         console.error("Error writing partyLinks to Firestore:", error);
-      }
+      const flattenedLinks = flattenPartyLinks(partyLinks as PartyLinks);
+      const setDocPromise = setDoc(
+         docRef,
+         { partyLinks: flattenedLinks },
+         { merge: true }
+      )
+         .then(() => console.log("PartyLinks sync to Firestore complete"))
+         .catch((error) =>
+            console.error("Error writing partyLinks to Firestore:", error)
+         );
+
+      //set writing state to true while awaiting for Firestore write to complete
+      setWriting(true);
+      await setDocPromise;
+      setWriting(false);
    }, [partyLinks, docRef]);
 
    useEffect(() => {

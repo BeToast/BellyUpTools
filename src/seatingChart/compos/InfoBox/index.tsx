@@ -6,8 +6,13 @@ import LinkParty from "./LinkParty";
 import { arraysEqual } from "../../utils/generic";
 import InfoSection from "./InfoSection";
 import PartyConnected from "./PartyConnected";
+import LoginInfo from "./LoginInfo";
+import WritingStatus from "./WritingStatus";
+import { UserCredential } from "firebase/auth";
 
-const InfoBox: React.FC<{}> = ({}) => {
+const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
+   storedCredential,
+}) => {
    const {
       state,
       unlinkedPartiesArray,
@@ -227,88 +232,95 @@ const InfoBox: React.FC<{}> = ({}) => {
       <>
          <div className="info-wrap no-print">
             <div className="info-wrap-fixed">
-               <div className="info-box">
-                  {/* party list */}
-                  <InfoSection header="Parties">
-                     {parties.length > 0 ? (
-                        <div className="parties">
-                           {parties.map((party, index) => (
-                              <div key={party} className="party-row">
-                                 <RemoveParty
-                                    party={party}
-                                    removePartyHandler={() =>
-                                       removePartyHandler(party)
-                                    }
-                                 />
-                                 {parties.length > 1 ? (
-                                    <PartyConnected
+               <LoginInfo storedCredential={storedCredential} />
+               <WritingStatus />
+               <div className="info-box-grow">
+                  <div className="info-box">
+                     {/* party list */}
+                     <InfoSection header="Parties">
+                        {parties.length > 0 ? (
+                           <div className="parties">
+                              {parties.map((party, index) => (
+                                 <div key={party} className="party-row">
+                                    <RemoveParty
                                        party={party}
-                                       connectHandler={() =>
-                                          connectHandler(party)
-                                       }
-                                       disconnectHandler={() =>
-                                          disconnectHandler(party)
+                                       removePartyHandler={() =>
+                                          removePartyHandler(party)
                                        }
                                     />
-                                 ) : (
-                                    <></>
-                                 )}
-                                 <div key={index} className="party">
-                                    {party.startsWith("_")
-                                       ? party.substring(1)
-                                       : party}
+                                    {parties.length > 1 ? (
+                                       <PartyConnected
+                                          party={party}
+                                          connectHandler={() =>
+                                             connectHandler(party)
+                                          }
+                                          disconnectHandler={() =>
+                                             disconnectHandler(party)
+                                          }
+                                       />
+                                    ) : (
+                                       <></>
+                                    )}
+                                    <div key={index} className="party">
+                                       {party.startsWith("_")
+                                          ? party.substring(1)
+                                          : party}
+                                    </div>
                                  </div>
-                              </div>
-                           ))}
-                        </div>
-                     ) : (
-                        <></>
-                     )}
+                              ))}
+                           </div>
+                        ) : (
+                           <></>
+                        )}
 
-                     {/* add party box */}
-                     {/* if has table or there is no assigned party then display add party box */}
-                     {tableCount > 0 || parties.length == 0 ? (
-                        addPartyJsx
-                     ) : (
-                        <></>
-                     )}
-                  </InfoSection>
-                  {/* selected/assigned info */}
-                  <InfoSection header="Seats">
-                     <div className="selected-info">
-                        <div>
-                           {tableCount} : {tableCount > 1 ? "Tables" : "Table"}
-                        </div>
-                        <div>{railCount} : Rail</div>
-                     </div>
-                  </InfoSection>
-
-                  {/* if there is things to be linked to */}
-                  {parties.length > 0 &&
-                  (otherCombinedLinkOptions.length > 0 ||
-                     linkedArrayIndex > -1) &&
-                  (tableCount > 0 || railCount > 0) ? ( // if there is a selected Selectable
-                     <InfoSection header="Linked">
-                        <LinkParty
-                           currParties={parties}
-                           linkedArrayIndex={linkedArrayIndex}
-                           otherCombinedLinkOptions={otherCombinedLinkOptions}
-                        />
+                        {/* add party box */}
+                        {/* if has table or there is no assigned party then display add party box */}
+                        {tableCount > 0 || parties.length == 0 ? (
+                           addPartyJsx
+                        ) : (
+                           <></>
+                        )}
                      </InfoSection>
-                  ) : (
-                     <></>
-                  )}
-                  {/* deselect */}
-                  {selectedCount > 0 ? (
-                     <button
-                        onClick={deselectHandler}
-                        className="deselect-button"
-                     >
-                        Done
-                     </button>
-                  ) : (
-                     <></>
-                  )}
+                     {/* selected/assigned info */}
+                     <InfoSection header="Seats">
+                        <div className="selected-info">
+                           <div>
+                              {tableCount} :{" "}
+                              {tableCount > 1 ? "Tables" : "Table"}
+                           </div>
+                           <div>{railCount} : Rail</div>
+                        </div>
+                     </InfoSection>
+
+                     {/* if there is things to be linked to */}
+                     {parties.length > 0 &&
+                     (otherCombinedLinkOptions.length > 0 ||
+                        linkedArrayIndex > -1) &&
+                     (tableCount > 0 || railCount > 0) ? ( // if there is a selected Selectable
+                        <InfoSection header="Linked">
+                           <LinkParty
+                              currParties={parties}
+                              linkedArrayIndex={linkedArrayIndex}
+                              otherCombinedLinkOptions={
+                                 otherCombinedLinkOptions
+                              }
+                           />
+                        </InfoSection>
+                     ) : (
+                        <></>
+                     )}
+                     {/* deselect */}
+                     {selectedCount > 0 ? (
+                        <button
+                           onClick={deselectHandler}
+                           className="deselect-button"
+                        >
+                           Done
+                        </button>
+                     ) : (
+                        <></>
+                     )}
+                  </div>
                </div>
             </div>
          </div>

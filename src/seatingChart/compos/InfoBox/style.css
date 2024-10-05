@@ -14,10 +14,18 @@
    position: fixed;
    top: 16px;
    bottom: 16px;
+   gap: 8px;
    width: var(--info-width);
    display: flex;
    flex-direction: column;
+   justify-content: start;
+}
+
+.info-box-grow {
+   display: flex;
    justify-content: center;
+   align-items: center;
+   flex-grow: 1;
 }
 
 .info-box {

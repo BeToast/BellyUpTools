@@ -2,34 +2,29 @@ import "./style.css";
 
 import React from "react";
 import { providerMicrosoft } from "../firebase";
-import {
-   getAuth,
-   signInWithPopup,
-   OAuthProvider,
-   UserCredential,
-} from "firebase/auth";
+import { getAuth, signInWithPopup, UserCredential } from "firebase/auth";
 
 import Modal from "../../seatingChart/compos/Modal";
 
 const MicrosoftOAuth: React.FC<{
-   setStoredToken: React.Dispatch<React.SetStateAction<string | null>>;
-}> = ({ setStoredToken }) => {
+   setStoredCredential: React.Dispatch<
+      React.SetStateAction<UserCredential | null>
+   >;
+}> = ({ setStoredCredential }) => {
    const auth = getAuth();
 
    const handleSignIn = async (): Promise<void> => {
       try {
-         const result: UserCredential = await signInWithPopup(
+         const credential: UserCredential = await signInWithPopup(
             auth,
             providerMicrosoft
          );
-         const credential = OAuthProvider.credentialFromResult(result);
-         console.log(credential);
-         if (credential && credential.idToken) {
-            setStoredToken(credential.idToken);
+         if (credential) {
+            setStoredCredential(credential);
             localStorage.setItem(
-               "microsoftOAuthToken",
+               "microsoftUserCredential",
                JSON.stringify({
-                  token: credential.idToken,
+                  results: credential,
                   timestamp: new Date().getTime(),
                })
             );

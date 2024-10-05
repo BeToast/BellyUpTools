@@ -67,6 +67,8 @@ interface SelectedContextType {
       React.SetStateAction<[string, string[]][] | undefined>
    >;
    firestoreLoaded: boolean;
+   writing: boolean;
+   setWriting: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SelectedContext = createContext<SelectedContextType>({
@@ -98,6 +100,8 @@ const SelectedContext = createContext<SelectedContextType>({
    docInputs: undefined,
    setDocInputs: () => {},
    firestoreLoaded: false,
+   writing: false,
+   setWriting: () => {},
 });
 
 export const SelectedProvider: React.FC<{
@@ -121,7 +125,6 @@ export const SelectedProvider: React.FC<{
 
    useEffect(() => {
       const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
-         console.log("Received doc snapshot");
          if (docSnapshot.exists()) {
             const data = docSnapshot.data();
             if (data) {
@@ -224,6 +227,7 @@ export const SelectedProvider: React.FC<{
    >({});
    const [prevAssignedStateHash, setPrevAssignedStateHash] =
       useState<string>("");
+   const [writing, setWriting] = useState<boolean>(false);
 
    //this is to set assignedState when nessicary for firebase syncing
    useEffect(() => {
@@ -525,6 +529,8 @@ export const SelectedProvider: React.FC<{
       docInputs,
       setDocInputs,
       firestoreLoaded,
+      writing,
+      setWriting,
    };
 
    return (

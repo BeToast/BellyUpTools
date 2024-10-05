@@ -21,9 +21,4 @@ export default defineConfig({
    },
    base: "/reportTools/",
    publicDir: "../../public",
-   resolve: {
-      alias: {
-         "@shared": path.resolve(__dirname, "../shared"),
-      },
-   },
 });

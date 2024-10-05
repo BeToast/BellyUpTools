@@ -21,9 +21,4 @@ export default defineConfig({
    },
    base: "/seatingChart/",
    publicDir: "../../public",
-   resolve: {
-      alias: {
-         "@shared": path.resolve(__dirname, "../shared"),
-      },
-   },
 });
