@@ -5,7 +5,9 @@
 
 .linked-party-wrapper {
    display: flex;
+   flex-grow: 1;
    flex-direction: column;
+   min-height: 0; /* Allow flex item to shrink below content size */
    justify-content: center;
    align-items: left;
    gap: 8px;

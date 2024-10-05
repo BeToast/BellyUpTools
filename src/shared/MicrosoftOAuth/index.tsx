@@ -24,7 +24,7 @@ const MicrosoftOAuth: React.FC<{
             localStorage.setItem(
                "microsoftUserCredential",
                JSON.stringify({
-                  results: credential,
+                  credential: credential,
                   timestamp: new Date().getTime(),
                })
             );

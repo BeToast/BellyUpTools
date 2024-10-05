@@ -44,7 +44,6 @@ const LinkParty: React.FC<{
    // Filter out subsets and individual parties that are part of a larger set
    const filteredCombinedLinkOptions = useMemo(() => {
       const flattenedLinkedArray = linkedArray.flat();
-      const allLinkedParties = partyLinks.flat(2); // Flatten all linked parties
 
       // Sort options by length (descending) to prioritize larger sets
       const sortedOptions = [...otherCombinedLinkOptions].sort(
@@ -83,36 +82,36 @@ const LinkParty: React.FC<{
    );
 
    return (
-      <div ref={dropdownRef}>
-         <div className="linked-party-wrapper">
-            {linkedArray.map((currentParty: Array<string>, index) => (
-               <div key={index} className="linked-party">
-                  <RemoveLink
-                     currentParty={currentParty}
-                     removeLinkHandler={() =>
-                        removePartyLink(currentParty, linkedArrayIndex)
-                     }
-                  />
-                  {removeUnderscore(currentParty)}
-               </div>
-            ))}
-            {filteredCombinedLinkOptions.length > 0 && (
-               <input
-                  type="text"
-                  className="party-input"
-                  placeholder={
-                     linkedArray.length > 0
-                        ? "Link Another Party"
-                        : "Search Parties to Link"
+      <div ref={dropdownRef} className="linked-party-wrapper">
+         {linkedArray.map((currentParty: Array<string>, index) => (
+            <div key={index} className="linked-party">
+               <RemoveLink
+                  currentParty={currentParty}
+                  removeLinkHandler={() =>
+                     removePartyLink(currentParty, linkedArrayIndex)
                   }
-                  value={searchTerm}
-                  onFocus={handleToggleDropdown}
-                  onBlur={handleToggleDropdown}
-                  onChange={handleSearchChange}
                />
-            )}
-            {isOpen && (
-               <>
+               {removeUnderscore(currentParty)}
+            </div>
+         ))}
+         {filteredCombinedLinkOptions.length > 0 && (
+            <input
+               type="text"
+               className="party-input"
+               placeholder={
+                  linkedArray.length > 0
+                     ? "Link Another Party"
+                     : "Search Parties to Link"
+               }
+               value={searchTerm}
+               onFocus={handleToggleDropdown}
+               onBlur={handleToggleDropdown}
+               onChange={handleSearchChange}
+            />
+         )}
+         {isOpen && (
+            <>
+               <div className="scroll-y">
                   {searchedLinkOptions.map((party, index) => (
                      <div
                         className="link-option"
@@ -123,9 +122,9 @@ const LinkParty: React.FC<{
                         {removeUnderscore(party.flat())}
                      </div>
                   ))}
-               </>
-            )}
-         </div>
+               </div>
+            </>
+         )}
       </div>
    );
 };

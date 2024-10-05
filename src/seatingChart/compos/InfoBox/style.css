@@ -4,6 +4,12 @@
    --info-padding-y: 24px;
 }
 
+.status-box {
+   position: fixed;
+   top: 16px;
+   width: var(--info-width);
+}
+
 .info-wrap {
    position: "relative";
    width: var(--info-width);
@@ -15,18 +21,20 @@
    top: 16px;
    bottom: 16px;
    gap: 8px;
+   margin-top: 116px;
+   height: calc(100vh - 148px);
    width: var(--info-width);
    display: flex;
    flex-direction: column;
-   justify-content: start;
+   justify-content: center;
 }
 
-.info-box-grow {
+/* .info-box-grow {
    display: flex;
    justify-content: center;
    align-items: center;
    flex-grow: 1;
-}
+} */
 
 .info-box {
    display: flex;
@@ -45,6 +53,7 @@
    padding-left: var(--info-padding-x);
    /* calculate width excluding padding */
    width: calc(var(--info-width) - var(--info-padding-x) * 2);
+   max-height: 100%;
    transition: all 0.3s;
 }
 .party-input-label {
@@ -170,6 +179,13 @@
 .info-box > .section {
    position: relative;
 }
+.info-box > .section.links {
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
+   min-height: 0;
+}
+
 .info-box > .section > .absolute {
    position: absolute;
    top: 0;
@@ -197,4 +213,11 @@
 .info-box > .section > .content {
    padding-left: 24px;
    padding-top: 40px;
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
+   min-height: 0;
+}
+.scroll-y {
+   overflow-y: scroll;
 }
