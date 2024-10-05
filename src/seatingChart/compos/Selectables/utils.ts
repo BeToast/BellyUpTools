@@ -82,6 +82,7 @@ export const handleElementClick = (
       setAssigned(id, []);
       setSelected(id, false);
    }
+   document.getElementById("party-name-input")?.focus();
 };
 
 export const getAssignments = (
