@@ -30,8 +30,8 @@ const LinkParty: React.FC<{
       };
    }, []);
 
-   const handleToggleDropdown = () => {
-      setIsOpen(!isOpen);
+   const openDropdown = (bool: boolean) => {
+      setIsOpen(bool);
    };
 
    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,8 +104,8 @@ const LinkParty: React.FC<{
                      : "Search Parties to Link"
                }
                value={searchTerm}
-               onFocus={handleToggleDropdown}
-               onBlur={handleToggleDropdown}
+               onFocus={() => openDropdown(true)}
+               onBlur={() => openDropdown(false)}
                onChange={handleSearchChange}
             />
          )}
