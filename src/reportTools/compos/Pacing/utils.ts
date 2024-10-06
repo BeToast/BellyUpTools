@@ -227,21 +227,6 @@ ${privateLine}
 `;
 };
 
-// const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
-// export const dateFromString = (completed: string): Date => {
-//    if (!completed) return new Date();
-
-//    const match = completed.match(dateRegex);
-//    if (match) {
-//       const [, month, day, year] = match.map((n) => parseInt(n, 10));
-//       // Note: month is 0-indexed in JavaScript Date object
-//       return new Date(year, month - 1, day);
-//    } else {
-//       return new Date();
-//       // throw new Error("Invalid completed: string");
-//    }
-// };
-
 const areEqualByComponents = (date1: Date, date2: Date): boolean => {
    return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -255,22 +240,9 @@ function excelSerialDateToJSDate(serial: number): Date {
    const utc_value = utc_days * 86400;
    const date_info = new Date(utc_value * 1000);
 
-   // const fractional_day = serial - Math.floor(serial) + 0.0000001;
-
-   // let total_seconds = Math.floor(86400 * fractional_day);
-
-   // const seconds = total_seconds % 60;
-   // total_seconds -= seconds;
-
-   // const hours = Math.floor(total_seconds / (60 * 60));
-   // const minutes = Math.floor(total_seconds / 60) % 60;
-
    return new Date(
       date_info.getFullYear(),
       date_info.getMonth(),
       date_info.getDate()
-      // hours,
-      // minutes,
-      // seconds
    );
 }
