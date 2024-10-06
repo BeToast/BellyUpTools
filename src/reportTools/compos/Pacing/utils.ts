@@ -158,16 +158,73 @@ export const calculateSalesPacing = (
 
    const private_ = privateGa + privateRes;
 
-   return `${eventName}, ${eventDate.toDateString()}
-Total: ${total} (ga ${totalGa}, res ${totalRes})
-Presale: ${
+   const waitlistGa = json
+      .filter(
+         (row) =>
+            row.Source === "Hold_Bank" &&
+            row["Ticket Type"] === "General Admission"
+      )
+      .reduce(
+         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+         0
+      );
+   const waitlistRes = json
+      .filter(
+         (row) =>
+            row.Source === "Hold_Bank" && row["Ticket Type"] === "Reserved"
+      )
+      .reduce(
+         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+         0
+      );
+
+   const waitlist = waitlistGa + waitlistRes;
+
+   // New code to check for "Hold Bank" and find the last public sale date
+   const hasHoldBank = json.some((row) => row.Source === "Hold_Bank");
+   let soldOutDate: Date | null = null;
+
+   if (hasHoldBank) {
+      const lastPublicSaleDate = json
+         .filter((row) => row.Source === "_Public")
+         .reduce((latest, current) => {
+            const currentDate = excelSerialDateToJSDate(current.Completed);
+            return latest === null || currentDate > latest
+               ? currentDate
+               : latest;
+         }, null as Date | null);
+      if (lastPublicSaleDate) {
+         soldOutDate = lastPublicSaleDate;
+      }
+   }
+
+   const eventNameDateLine = `${eventName} - ${eventDate.toDateString()}`;
+   const totalLine = `Total: ${total} (ga ${totalGa}, res ${totalRes})`;
+   const presaleLine = `Presale: ${
       hadPresale
          ? `${presale} (ga ${presaleGa}, res ${presaleRes})`
          : "there was no presale"
-   }
-1st day public: ${firstDayPublic} (ga ${firstDayPublicGa}, res ${firstDayPublicRes})
-DOS: ${dos} (ga ${dosGa}, res ${dosRes})
-Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
+   }`;
+   const firstDayPublicLine = `1st day public: ${firstDayPublic} (ga ${firstDayPublicGa}, res ${firstDayPublicRes})`;
+   const dosLine = `DOS: ${dos} (ga ${dosGa}, res ${dosRes})`;
+   const soldOutLine: string | null = soldOutDate
+      ? `Show sold out - ${soldOutDate.toDateString()}\nWaitlist: ${waitlist} (ga ${waitlistGa}, res ${waitlistRes})`
+      : null;
+   const privateLine = `Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
+
+   return `${eventNameDateLine}
+${totalLine}
+${presaleLine}
+${firstDayPublicLine}
+${
+   soldOutDate
+      ? soldOutDate < eventDate
+         ? `${soldOutLine}\n${dosLine}`
+         : `${dosLine}\n${soldOutLine}`
+      : dosLine
+}
+${privateLine}
+`;
 };
 
 // const dateRegex = /(\d{2})-(\d{2})-(\d{4})/;
