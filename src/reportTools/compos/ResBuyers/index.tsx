@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx-js-style";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
@@ -62,12 +62,12 @@ const ResBuyers: React.FC<{
             row.First,
             row.Last,
             row.Email,
-            row.Delivery,
+            row.Delivery == "Will Call" ? "Will Call" : "Mobile",
             row.QTY,
          ]),
          styles: {
             fontSize: 10,
-            cellPadding: 2,
+            cellPadding: 1,
             halign: "left",
          },
          headStyles: {
@@ -76,14 +76,14 @@ const ResBuyers: React.FC<{
             fontStyle: "bold",
             halign: "left",
          },
-         margin: { top: 10, right: 10, bottom: 10, left: 10 },
+         margin: { top: 10, right: 5, left: 5 },
          columnStyles: {
             0: { cellWidth: "auto" },
             1: { cellWidth: "auto" },
             2: { cellWidth: "auto" },
             3: { cellWidth: "auto" },
-            4: { cellWidth: "auto" },
-            5: { cellWidth: 20 },
+            4: { cellWidth: 18 },
+            5: { cellWidth: 10 },
          },
       });
 
