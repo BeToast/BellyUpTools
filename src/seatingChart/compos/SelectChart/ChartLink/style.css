@@ -11,6 +11,9 @@
 
    cursor: pointer;
 }
+.chart-card > h3 {
+   margin-top: 2px;
+}
 
 .chart-icon {
    padding: 6px;

@@ -219,5 +219,5 @@
    min-height: 0;
 }
 .scroll-y {
-   overflow-y: scroll;
+   overflow-y: auto;
 }
