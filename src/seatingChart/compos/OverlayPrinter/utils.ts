@@ -8,6 +8,11 @@ export interface Lrtb {
    bottom: number;
 }
 
+export interface Point {
+   x: number;
+   y: number;
+}
+
 export function getLrtb(elements: Element[]): Lrtb {
    const rects = elements.map((el) => el.getBoundingClientRect());
    return {
@@ -53,6 +58,51 @@ export const partyPound = (parties: Array<string>) => {
 };
 export const partyUnPound = (partyPound: string): Array<string> => {
    return partyPound.split("£");
+};
+
+export const findThirdPoint = (
+   seatPoint: Point,
+   tableCenter: Point,
+   tableRadius: number,
+   isLeftTangent: boolean
+): Point => {
+   tableRadius--;
+   // Vector from circle center to seat point
+   const dx = seatPoint.x - tableCenter.x;
+   const dy = seatPoint.y - tableCenter.y;
+
+   // Distance from circle center to seat point
+   const distance = Math.sqrt(dx * dx + dy * dy);
+
+   // Angle between the line from circle center to seat point and the tangent line
+   const angle = Math.acos(tableRadius / distance);
+
+   // Determine rotation direction based on isLeftTangent
+   const rotationAngle = isLeftTangent ? angle : -angle;
+
+   // Rotate the vector from circle center to seat point
+   const rotatedDx =
+      dx * Math.cos(rotationAngle) - dy * Math.sin(rotationAngle);
+   const rotatedDy =
+      dx * Math.sin(rotationAngle) + dy * Math.cos(rotationAngle);
+
+   // Scale the rotated vector to the circle's radius
+   const scale =
+      tableRadius / Math.sqrt(rotatedDx * rotatedDx + rotatedDy * rotatedDy);
+
+   // Calculate the tangent point
+   return {
+      x: tableCenter.x + rotatedDx * scale,
+      y: tableCenter.y + rotatedDy * scale,
+   };
+};
+
+export const getCenter = (element: Element): Point => {
+   const rect = element.getBoundingClientRect();
+   return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+   };
 };
 
 export const styleBase: React.CSSProperties = {

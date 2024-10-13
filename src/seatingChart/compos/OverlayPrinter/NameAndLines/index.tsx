@@ -314,8 +314,6 @@ export const getReturnJsx = ({
 
    return (
       <React.Fragment>
-         <span style={{ color: "transparent", pointerEvents: "none" }}>;</span>
-         {/* THIS SEMICOLON IS THE REASON EVERYTHING IS 20px OFFSET ON Y AXIS!!!  */}
          {assignedUnPounded ? <div style={style}>{partyJsx}</div> : <></>}
          {linesJsx}
       </React.Fragment>

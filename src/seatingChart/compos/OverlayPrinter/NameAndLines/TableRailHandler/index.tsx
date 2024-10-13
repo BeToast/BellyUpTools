@@ -1,6 +1,13 @@
 import React from "react";
 import { getReturnJsx } from "..";
-import { getLrtb, Lrtb, partyUnPound } from "../../utils";
+import {
+   findThirdPoint,
+   getCenter,
+   getLrtb,
+   Lrtb,
+   partyUnPound,
+   Point,
+} from "../../utils";
 import LineDiv from "../LineDiv";
 
 const TableRailHandler: React.FC<{
@@ -36,7 +43,38 @@ const TableRailHandler: React.FC<{
       bRailBottom: number;
    var linesJsx: JSX.Element = <></>;
 
-   const tables = elements.filter((el) => el.id.startsWith("Table "));
+   const tables = elements
+      .filter((el) => el.id.startsWith("Table "))
+      .sort((a, b) => {
+         const numA = parseInt(a.id.slice(6), 10);
+         const numB = parseInt(b.id.slice(6), 10);
+         return numA - numB;
+      });
+
+   const firstTableLrtb = getLrtb([tables.at(0)!]);
+
+   const firstTableLeft = firstTableLrtb.left - paperRect.left;
+   const firstTableRight = firstTableLrtb.right - paperRect.left;
+   const firstTableTop = firstTableLrtb.top + scrollTop - flexieMargin;
+   const firstTableBottom = firstTableLrtb.bottom + scrollTop - flexieMargin;
+
+   const firstTableCenter: Point = {
+      x: (firstTableLeft + firstTableRight) / 2 - 2,
+      y: (firstTableTop + firstTableBottom) / 2 - 2,
+   };
+
+   const lastTableLrtb = getLrtb([tables.at(-1)!]);
+
+   const lastTableLeft = lastTableLrtb.left - paperRect.left;
+   const lastTableRight = lastTableLrtb.right - paperRect.left;
+   const lastTableTop = lastTableLrtb.top + scrollTop - flexieMargin;
+   const lastTableBottom = lastTableLrtb.bottom + scrollTop - flexieMargin;
+
+   const lastTableCenter: Point = {
+      x: (lastTableLeft + lastTableRight) / 2 - 2,
+      y: (lastTableTop + lastTableBottom) / 2 - 2,
+   };
+
    const kitchenRail = elements.filter((el) => el.id.match(/Seat k+\d/));
    const bathroomRail = elements.filter((el) => el.id.match(/Seat b+\d/));
 
@@ -63,41 +101,51 @@ const TableRailHandler: React.FC<{
       kRailLrtb = getLrtb(kitchenRail);
       kRailLeft = kRailLrtb.left - paperRect.left;
       // kRailRight = kRailLrtb.right - paperRect.left;
-      kRailTop = kRailLrtb.top + scrollTop - flexieMargin - 26;
-      kRailBottom = kRailLrtb.bottom + scrollTop - flexieMargin - 26;
+      kRailTop = kRailLrtb.top + scrollTop - flexieMargin;
+      kRailBottom = kRailLrtb.bottom + scrollTop - flexieMargin;
 
       if (printLines) {
          linesJsx = (
             <React.Fragment>
                <LineDiv
-                  pointOne={{
-                     x: tableLeft + tableRadius,
-                     y: tableTop - 25,
-                  }}
+                  pointOne={findThirdPoint(
+                     {
+                        x: kRailLeft - 1,
+                        y: kRailTop - 2,
+                     },
+                     firstTableCenter,
+                     tableRadius,
+                     false
+                  )}
                   pointTwo={{
-                     x: kRailLeft,
-                     y: kRailTop + 1,
+                     x: kRailLeft - 1,
+                     y: kRailTop - 2,
                   }}
                />
                <LineDiv
-                  pointOne={{
-                     x: tableLeft + tableRadius,
-                     y: tableBottom - 27,
-                  }}
+                  pointOne={findThirdPoint(
+                     {
+                        x: kRailLeft,
+                        y: kRailBottom,
+                     },
+                     firstTableCenter,
+                     tableRadius,
+                     true
+                  )}
                   pointTwo={{
-                     x: kRailLeft,
-                     y: kRailBottom - 1,
+                     x: kRailLeft - 1,
+                     y: kRailBottom - 3,
                   }}
                />
                {tables.length > 1 ? (
                   <LineDiv
                      pointOne={{
                         x: tableLeft + 1,
-                        y: tableTop + 26,
+                        y: tableTop,
                      }}
                      pointTwo={{
                         x: tableLeft + 1,
-                        y: tableBottom - tableRadius - 26,
+                        y: tableBottom - tableRadius,
                      }}
                   />
                ) : (
@@ -125,25 +173,35 @@ const TableRailHandler: React.FC<{
       bRailLeft = bRailLrtb.left - paperRect.left;
       bRailRight = bRailLrtb.right - paperRect.left - 2;
       // bRailTop = bRailLrtb.top + scrollTop - flexieMargin - 26;
-      bRailBottom = bRailLrtb.bottom + scrollTop - flexieMargin - 26;
+      bRailBottom = bRailLrtb.bottom + scrollTop - flexieMargin;
 
       linesJsx = (
          <React.Fragment>
             <LineDiv
-               pointOne={{
-                  x: tableLeft - 1,
-                  y: tableTop + tableRadius - 26,
-               }}
+               pointOne={findThirdPoint(
+                  {
+                     x: bRailLeft - 2,
+                     y: bRailBottom,
+                  },
+                  firstTableCenter,
+                  tableRadius,
+                  false
+               )}
                pointTwo={{
                   x: bRailLeft - 2,
                   y: bRailBottom,
                }}
             />
             <LineDiv
-               pointOne={{
-                  x: tableRight - 3,
-                  y: tableTop + tableRadius - 26,
-               }}
+               pointOne={findThirdPoint(
+                  {
+                     x: bRailRight,
+                     y: bRailBottom,
+                  },
+                  lastTableCenter,
+                  tableRadius,
+                  true
+               )}
                pointTwo={{
                   x: bRailRight,
                   y: bRailBottom,
@@ -153,11 +211,11 @@ const TableRailHandler: React.FC<{
                <LineDiv
                   pointOne={{
                      x: tableLeft + tableRadius,
-                     y: tableBottom - 27,
+                     y: tableBottom - 3,
                   }}
                   pointTwo={{
                      x: tableRight - tableRadius,
-                     y: tableBottom - 27,
+                     y: tableBottom - 3,
                   }}
                />
             ) : (
@@ -183,34 +241,64 @@ const TableRailHandler: React.FC<{
       kRailLrtb = getLrtb(kitchenRail);
       kRailLeft = kRailLrtb.left - paperRect.left;
       kRailRight = kRailLrtb.right - paperRect.left - 2;
-      kRailTop = kRailLrtb.top + scrollTop - flexieMargin - 26;
-      kRailBottom = kRailLrtb.bottom + scrollTop - flexieMargin - 26;
+      kRailTop = kRailLrtb.top + scrollTop - flexieMargin;
+      kRailBottom = kRailLrtb.bottom + scrollTop - flexieMargin;
 
       bRailLrtb = getLrtb(bathroomRail);
       bRailLeft = bRailLrtb.left - paperRect.left;
       bRailRight = bRailLrtb.right - paperRect.left - 2;
       // bRailTop = bRailLrtb.top + scrollTop - flexieMargin - 26;
-      bRailBottom = bRailLrtb.bottom + scrollTop - flexieMargin - 26;
+      bRailBottom = bRailLrtb.bottom + scrollTop - flexieMargin;
       linesJsx = (
          <React.Fragment>
             <LineDiv
-               pointOne={{
-                  x: tableLeft + tableRadius,
-                  y: tableTop - 26,
-               }}
+               pointOne={findThirdPoint(
+                  {
+                     x: kRailLeft,
+                     y: kRailTop,
+                  },
+                  firstTableCenter,
+                  tableRadius,
+                  false
+               )}
                pointTwo={{
-                  x: kRailLeft,
-                  y: kRailTop,
+                  x: kRailLeft - 1,
+                  y: kRailTop - 1,
+               }}
+            />
+            <LineDiv
+               pointOne={findThirdPoint(
+                  {
+                     x: bRailRight,
+                     y: bRailBottom,
+                  },
+                  lastTableCenter,
+                  tableRadius,
+                  true
+               )}
+               pointTwo={{
+                  x: bRailRight,
+                  y: bRailBottom - 2,
                }}
             />
             <LineDiv
                pointOne={{
-                  x: tableRight - 2,
-                  y: tableBottom - 26 - tableRadius,
+                  x: tableLeft + 1,
+                  y: tableTop + tableRadius,
                }}
                pointTwo={{
-                  x: bRailRight,
-                  y: bRailBottom,
+                  x: tableLeft + 1,
+                  y: tableBottom - tableRadius,
+               }}
+            />
+            <LineDiv
+               pointOne={{
+                  x: tableLeft + tableRadius,
+                  y: tableBottom - 3,
+               }}
+               pointTwo={{
+                  x: tableRight - tableRadius,
+                  y: tableBottom - 3,
                }}
             />
          </React.Fragment>

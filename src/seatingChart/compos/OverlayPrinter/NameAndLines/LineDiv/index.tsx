@@ -1,9 +1,10 @@
 import React from "react";
 import "./style.css";
+import { Point } from "jspdf";
 
 interface LineProps {
-   pointOne: { x: number; y: number };
-   pointTwo: { x: number; y: number };
+   pointOne: Point;
+   pointTwo: Point;
 }
 
 const LineDiv: React.FC<LineProps> = ({ pointOne, pointTwo }) => {

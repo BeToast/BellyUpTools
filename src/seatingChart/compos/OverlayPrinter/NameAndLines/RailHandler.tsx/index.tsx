@@ -39,27 +39,25 @@ const RailHandler: React.FC<{
    const setBottom = railLrtb.bottom + scrollTop - flexieMargin;
    const centerY = (setTop + setBottom) / 2;
 
-   const twentySix: number = 25;
-
    // KITCHEN --------------------------------------------------------------------------------------------
    if (hasKitchenSeats && !hasBathroomSeats) {
       linesJsx = (
          <React.Fragment>
             <LineDiv
-               pointOne={{ x: relativeRight, y: setTop - twentySix }}
+               pointOne={{ x: relativeRight - 1, y: setTop - 1 }}
                pointTwo={{
                   x: relativeRight + 16,
-                  y: centerY - 8 - twentySix,
+                  y: centerY - 8,
                }}
             />
             <LineDiv
                pointOne={{
-                  x: relativeRight - 2,
-                  y: setBottom - twentySix,
+                  x: relativeRight - 3,
+                  y: setBottom - 1,
                }}
                pointTwo={{
-                  x: relativeRight + 16 - 2,
-                  y: centerY + 8 - twentySix,
+                  x: relativeRight + 16,
+                  y: centerY + 8,
                }}
             />
          </React.Fragment>
@@ -77,20 +75,20 @@ const RailHandler: React.FC<{
       linesJsx = (
          <React.Fragment>
             <LineDiv
-               pointOne={{ x: relativeLeft, y: setTop - twentySix }}
+               pointOne={{ x: relativeLeft - 1, y: setTop - 1 }}
                pointTwo={{
                   x: centerX - 10,
-                  y: setTop - 16 - twentySix,
+                  y: setTop - 16,
                }}
             />
             <LineDiv
                pointOne={{
                   x: relativeRight - 2,
-                  y: setTop - twentySix + 2,
+                  y: setTop + 1,
                }}
                pointTwo={{
                   x: centerX + 10,
-                  y: setTop - 16 - twentySix + 2,
+                  y: setTop - 16 + 1,
                }}
             />
          </React.Fragment>
@@ -114,21 +112,21 @@ const RailHandler: React.FC<{
             <LineDiv
                pointOne={{
                   x: relativeLeft + seatWidth,
-                  y: setTop - twentySix,
+                  y: setTop,
                }}
                pointTwo={{
                   x: centerX + 12,
-                  y: centerY - twentySix - 28,
+                  y: centerY - 28,
                }}
             />
             <LineDiv
                pointOne={{
-                  x: relativeRight - 2,
-                  y: setBottom - seatHeight - twentySix + 2,
+                  x: relativeRight - 1,
+                  y: setBottom - seatHeight + 1,
                }}
                pointTwo={{
-                  x: centerX + 28 - 2,
-                  y: centerY - twentySix - 12,
+                  x: centerX + 28 - 1,
+                  y: centerY - 12,
                }}
             />
          </React.Fragment>

@@ -83,13 +83,13 @@ const TableHandler: React.FC<{
 
       // Calculate points relative to the paper
       const topLeftX = topTableRect.left - paperRect.left;
-      const topLeftY = topTableRect.top + scrollTop - flexieMargin - 25;
+      const topLeftY = topTableRect.top + scrollTop - flexieMargin;
       const topRightX = topTableRect.right - paperRect.left;
-      const topRightY = topTableRect.top + scrollTop - flexieMargin - 25;
+      const topRightY = topTableRect.top + scrollTop - flexieMargin;
       const bottomLeftX = bottomTableRect.left - paperRect.left;
-      const bottomLeftY = bottomTableRect.top + scrollTop - flexieMargin - 25;
+      const bottomLeftY = bottomTableRect.top + scrollTop - flexieMargin;
       const bottomRightX = bottomTableRect.right - paperRect.left;
-      const bottomRightY = bottomTableRect.top + scrollTop - flexieMargin - 25;
+      const bottomRightY = bottomTableRect.top + scrollTop - flexieMargin;
 
       linesJsx = printLines ? (
          <React.Fragment>
@@ -144,15 +144,13 @@ const TableHandler: React.FC<{
 
       // Calculate points relative to the paper
       const topLeftX = leftmostTableRect.left - paperRect.left;
-      const topLeftY = leftmostTableRect.top + scrollTop - flexieMargin - 25;
+      const topLeftY = leftmostTableRect.top + scrollTop - flexieMargin;
       const topRightX = rightmostTableRect.right - paperRect.left;
-      const topRightY = rightmostTableRect.top + scrollTop - flexieMargin - 25;
+      const topRightY = rightmostTableRect.top + scrollTop - flexieMargin;
       const bottomLeftX = leftmostTableRect.left - paperRect.left;
-      const bottomLeftY =
-         leftmostTableRect.bottom + scrollTop - flexieMargin - 25;
+      const bottomLeftY = leftmostTableRect.bottom + scrollTop - flexieMargin;
       const bottomRightX = rightmostTableRect.right - paperRect.left;
-      const bottomRightY =
-         rightmostTableRect.bottom + scrollTop - flexieMargin - 25;
+      const bottomRightY = rightmostTableRect.bottom + scrollTop - flexieMargin;
 
       linesJsx = printLines ? (
          <React.Fragment>
@@ -207,10 +205,9 @@ const TableHandler: React.FC<{
 
       // Calculate points relative to the paper
       const topLeftX = topLeftRect.left - paperRect.left;
-      const topLeftY = topLeftRect.top + scrollTop - flexieMargin - 25;
+      const topLeftY = topLeftRect.top + scrollTop - flexieMargin;
       const bottomRightX = bottomRightRect.right - paperRect.left;
-      const bottomRightY =
-         bottomRightRect.bottom + scrollTop - flexieMargin - 25;
+      const bottomRightY = bottomRightRect.bottom + scrollTop - flexieMargin;
 
       linesJsx = printLines ? (
          <React.Fragment>
