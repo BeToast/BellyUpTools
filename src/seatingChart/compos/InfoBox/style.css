@@ -221,3 +221,7 @@
 .scroll-y {
    overflow-y: auto;
 }
+.notConnectedLinkMsg {
+   color: #656060;
+   font-size: 13px;
+}

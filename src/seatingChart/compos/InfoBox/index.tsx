@@ -23,6 +23,7 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       setAssigned,
       setSelected,
       partyLinks,
+      // setPartyLinks,
       addPartyLink,
       removePartyLink,
    } = useSelected();
@@ -111,20 +112,37 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    const connectHandler = (party: string) => {
       const newParties = [...parties];
       const index = newParties.indexOf(party);
+      const partyNoUnderscore = party.substring(1);
       if (index !== -1) {
-         newParties[index] = party.substring(1);
+         newParties[index] = partyNoUnderscore;
          setParties(newParties);
       }
+      // updatePartyLink(party, partyNoUnderscore);
+      // console.log(partyLinks);
+      // setPartyLinks;
    };
 
    const disconnectHandler = (party: string) => {
       const newParties = [...parties];
       const index = newParties.indexOf(party);
+      const partyUnderscore = `_${party}`;
       if (index !== -1) {
-         newParties[index] = `_${party}`;
+         newParties[index] = partyUnderscore;
          setParties(newParties);
       }
+      // updatePartyLink(party, partyUnderscore);
+      // console.log(partyLinks);
    };
+
+   // const updatePartyLink = (targetParty: string, replacement: string) => {
+   //    setPartyLinks((prevLinks) => {
+   //       return prevLinks.map((plane) =>
+   //          plane.map((row) =>
+   //             row.map((party) => (party === targetParty ? replacement : party))
+   //          )
+   //       );
+   //    });
+   // };
    ///////////////////////////////////////////////////////
    // end connect/disconnect handlers
    ///////////////////////////////////////////////////////
@@ -249,7 +267,8 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                                        removePartyHandler(party)
                                     }
                                  />
-                                 {parties.length > 1 ? (
+                                 {/* if party is not linked and there is a praty */}
+                                 {linkedArrayIndex < 0 && parties.length > 1 ? (
                                     <PartyConnected
                                        party={party}
                                        connectHandler={() =>
@@ -292,18 +311,26 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                      </div>
                   </InfoSection>
 
-                  {/* if there is things to be linked to */}
+                  {/* if parties are selected*/}
                   {parties.length > 0 &&
                   (otherCombinedLinkOptions.length > 0 ||
                      linkedArrayIndex > -1) &&
                   (tableCount > 0 || railCount > 0) ? ( // if there is a selected Selectable
-                     // <InfoSection header="Linked" className="scroll-y">
                      <InfoSection header="Linked" className="links">
-                        <LinkParty
-                           currParties={parties}
-                           linkedArrayIndex={linkedArrayIndex}
-                           otherCombinedLinkOptions={otherCombinedLinkOptions}
-                        />
+                        {partysAllConnected(parties) ? (
+                           <LinkParty
+                              currParties={parties}
+                              linkedArrayIndex={linkedArrayIndex}
+                              otherCombinedLinkOptions={
+                                 otherCombinedLinkOptions
+                              }
+                           />
+                        ) : (
+                           <span className="notConnectedLinkMsg">
+                              You cannot link a table comprised of seperate
+                              parties
+                           </span>
+                        )}
                      </InfoSection>
                   ) : (
                      <></>
@@ -327,3 +354,7 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
 };
 
 export default InfoBox;
+
+function partysAllConnected(parties: string[]): boolean {
+   return parties.every((party) => !party.startsWith("_"));
+}

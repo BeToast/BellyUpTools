@@ -72,17 +72,15 @@ const AbsolutePrinter: React.FC = () => {
                const partyPounded = partyPound(party);
                assignedArray.push(partyPounded);
                elementsArray.push(assignedElements[partyPounded]);
+
                partyLinksFlatPounded.push();
                // delete assignedElementsCopy[partyPound]; //TY SRINI - how do i remove an item from assignedElements??
             });
-            //log what has been done already
             partyLinksFlatPounded = [
                ...partyLinksFlatPounded,
                ...assignedArray,
             ];
             // NameAndLines with assignedArray and elementsArray
-            // console.log(assignedElementsCopy);
-            // console.log(elementsArray);
 
             return (
                <React.Fragment key={assignedArray[0]}>
