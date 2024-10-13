@@ -26,6 +26,7 @@
 }
 
 .input.show {
+   height: 42px;
    font-size: 48px;
    font-weight: 300;
    padding: 8px;
