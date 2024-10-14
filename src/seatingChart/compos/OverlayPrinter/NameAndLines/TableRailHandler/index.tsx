@@ -247,7 +247,7 @@ const TableRailHandler: React.FC<{
       bRailLrtb = getLrtb(bathroomRail);
       bRailLeft = bRailLrtb.left - paperRect.left;
       bRailRight = bRailLrtb.right - paperRect.left - 2;
-      // bRailTop = bRailLrtb.top + scrollTop - flexieMargin - 26;
+      bRailTop = bRailLrtb.top + scrollTop - flexieMargin;
       bRailBottom = bRailLrtb.bottom + scrollTop - flexieMargin;
       linesJsx = (
          <React.Fragment>
@@ -299,6 +299,16 @@ const TableRailHandler: React.FC<{
                pointTwo={{
                   x: tableRight - tableRadius,
                   y: tableBottom - 3,
+               }}
+            />
+            <LineDiv
+               pointOne={{
+                  x: kRailRight,
+                  y: kRailTop - 2,
+               }}
+               pointTwo={{
+                  x: bRailRight + 2,
+                  y: bRailTop,
                }}
             />
          </React.Fragment>
