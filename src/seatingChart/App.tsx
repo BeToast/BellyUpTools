@@ -38,6 +38,15 @@ function App() {
 
    window.addEventListener("popstate", () => setChartKey(getChartIdFromUrl()));
 
+   window.addEventListener("beforeprint", () => {
+      if (chartId) {
+         document.title = `SeatingChart_${chartId.replace(" ", "")}`;
+      }
+   });
+   window.addEventListener("afterprint", () => {
+      document.title = "Seating Chart Builder";
+   });
+
    return (
       <>
          {storedCredential ? (
