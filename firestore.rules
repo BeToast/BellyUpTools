@@ -2,13 +2,23 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function hasValidDomain() {
+      return request.auth.token.email.matches(".*@bellyupaspen\\.com$");
+    }
+
     // Default rule: deny all reads and writes
     match /{document=**} {
       allow read, write, delete: if false;
     }
 
     match /SeatingCharts/{document} {
-      allow read, write, delete: if true;
+      // Only allow authenticated users with bellyupaspen.com domain
+      allow read, write, delete: if isAuthenticated() && hasValidDomain();
     }
   }
 }
