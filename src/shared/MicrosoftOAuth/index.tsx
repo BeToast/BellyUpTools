@@ -1,36 +1,51 @@
 import "./style.css";
 
-import React from "react";
+import React, { useState } from "react";
 import { providerMicrosoft } from "../firebase";
 import { getAuth, signInWithPopup, UserCredential } from "firebase/auth";
 
 import Modal from "../../seatingChart/compos/Modal";
 
-const MicrosoftOAuth: React.FC<{
+interface MicrosoftOAuthProps {
    setStoredCredential: React.Dispatch<
       React.SetStateAction<UserCredential | null>
    >;
-}> = ({ setStoredCredential }) => {
+}
+
+const MicrosoftOAuth: React.FC<MicrosoftOAuthProps> = ({
+   setStoredCredential,
+}) => {
+   const [error, setError] = useState<string | null>(null);
+   const [isLoading, setIsLoading] = useState(false);
    const auth = getAuth();
 
    const handleSignIn = async (): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
+
       try {
-         const credential: UserCredential = await signInWithPopup(
-            auth,
-            providerMicrosoft
-         );
-         if (credential) {
-            setStoredCredential(credential);
-            localStorage.setItem(
-               "microsoftUserCredential",
-               JSON.stringify({
-                  credential: credential,
-                  timestamp: new Date().getTime(),
-               })
-            );
+         const credential = await signInWithPopup(auth, providerMicrosoft);
+
+         // Verify the email domain
+         const email = credential.user.email;
+         if (!email?.endsWith("@bellyupaspen.com")) {
+            await auth.signOut(); // Sign out if not the correct domain
+            setError("Please use your @bellyupaspen.com email address");
+            setStoredCredential(null);
+            return;
          }
+
+         setStoredCredential(credential);
       } catch (error) {
          console.error("Error during sign in:", error);
+         setError(
+            error instanceof Error
+               ? error.message
+               : "An error occurred during sign in"
+         );
+         setStoredCredential(null);
+      } finally {
+         setIsLoading(false);
       }
    };
 
@@ -42,9 +57,26 @@ const MicrosoftOAuth: React.FC<{
             <span style={{ fontStyle: "italic" }}>@bellyupaspen.com</span> email
             to access the seating chart.
          </p>
-         <div onClick={handleSignIn} className="login-microsoft">
-            Login with Microsoft
-         </div>
+
+         {error && (
+            <div
+               className="error-message"
+               style={{
+                  color: "red",
+                  marginBottom: "1rem",
+               }}
+            >
+               {error}
+            </div>
+         )}
+
+         <button
+            onClick={handleSignIn}
+            className="login-microsoft"
+            disabled={isLoading}
+         >
+            {isLoading ? "Signing in..." : "Login with Microsoft"}
+         </button>
       </Modal>
    );
 };

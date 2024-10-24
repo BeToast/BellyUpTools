@@ -1,9 +1,9 @@
 import "./App.css";
 import "../shared/firebase";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { doc } from "firebase/firestore";
-import { UserCredential } from "firebase/auth";
+import { UserCredential, getAuth, onAuthStateChanged } from "firebase/auth";
 
 import SelectChart from "./compos/SelectChart";
 import InfoBox from "./compos/InfoBox";
@@ -21,35 +21,62 @@ import MicrosoftOAuth from "../shared/MicrosoftOAuth";
 
 function App() {
    const [chartId, setChartKey] = useState<string | null>(getChartIdFromUrl());
-   const localStorageStr = localStorage.getItem("microsoftUserCredential");
-   const localStorageObj: {
-      credential: UserCredential;
-      timestamp: number;
-   } | null = localStorageStr ? JSON.parse(localStorageStr) : null;
-   const tokenExpired =
-      localStorageObj === null ||
-      new Date().getTime() - localStorageObj.timestamp > 1209600; //this is two weeks
+   const [user, setUser] = useState<UserCredential | null>(null);
+   const [loading, setLoading] = useState(true);
+   const auth = getAuth();
 
-   //stored token is set if its not experied and if it is not null
-   const [storedCredential, setStoredCredential] =
-      useState<UserCredential | null>(
-         tokenExpired ? null : localStorageObj?.credential
-      );
+   useEffect(() => {
+      // Set up auth state observer
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+         if (currentUser) {
+            // If we have a valid user session, get their credentials
+            // Note: You might need to adjust this based on how your Microsoft OAuth
+            // integration provides the UserCredential object
+            setUser({
+               user: currentUser,
+               providerId: currentUser.providerId,
+               operationType: "signIn",
+            } as UserCredential);
+         } else {
+            setUser(null);
+         }
+         setLoading(false);
+      });
 
-   window.addEventListener("popstate", () => setChartKey(getChartIdFromUrl()));
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+   }, [auth]);
 
-   window.addEventListener("beforeprint", () => {
-      if (chartId) {
-         document.title = `SeatingChart_${chartId.replace(" ", "")}`;
-      }
-   });
-   window.addEventListener("afterprint", () => {
-      document.title = "Seating Chart Builder";
-   });
+   // Event listeners
+   useEffect(() => {
+      const handlePopState = () => setChartKey(getChartIdFromUrl());
+      const handleBeforePrint = () => {
+         if (chartId) {
+            document.title = `SeatingChart_${chartId.replace(" ", "")}`;
+         }
+      };
+      const handleAfterPrint = () => {
+         document.title = "Seating Chart Builder";
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      window.addEventListener("beforeprint", handleBeforePrint);
+      window.addEventListener("afterprint", handleAfterPrint);
+
+      return () => {
+         window.removeEventListener("popstate", handlePopState);
+         window.removeEventListener("beforeprint", handleBeforePrint);
+         window.removeEventListener("afterprint", handleAfterPrint);
+      };
+   }, [chartId]);
+
+   if (loading) {
+      return <div>Loading...</div>;
+   }
 
    return (
       <>
-         {storedCredential ? (
+         {user ? (
             chartId === null ? (
                <SelectChart
                   chartCollection={seatingChartCollection}
@@ -58,7 +85,7 @@ function App() {
             ) : (
                <SelectedProvider docRef={doc(seatingChartCollection, chartId)}>
                   <div id="flexie" className="flexie">
-                     <InfoBox storedCredential={storedCredential} />
+                     <InfoBox storedCredential={user} />
                      <main id="letter-paper" className="letter-paper">
                         <Inputs />
                         <Tables />
@@ -74,7 +101,7 @@ function App() {
                </SelectedProvider>
             )
          ) : (
-            <MicrosoftOAuth setStoredCredential={setStoredCredential} />
+            <MicrosoftOAuth setStoredCredential={setUser} />
          )}
       </>
    );
