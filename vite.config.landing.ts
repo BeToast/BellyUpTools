@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
+// Generate timestamp for cache busting
+const timestamp = new Date().getTime();
+``;
 export default defineConfig({
    plugins: [react()],
    root: "src/landing",
@@ -10,9 +13,10 @@ export default defineConfig({
       emptyOutDir: true,
       rollupOptions: {
          output: {
-            entryFileNames: "assets/[name]-[hash].js",
-            chunkFileNames: "assets/[name]-[hash].js",
-            assetFileNames: "assets/[name]-[hash].[ext]",
+            // Add timestamp to the hash
+            entryFileNames: `assets/[name]-[hash]-${timestamp}.js`,
+            chunkFileNames: `assets/[name]-[hash]-${timestamp}.js`,
+            assetFileNames: `assets/[name]-[hash]-${timestamp}.[ext]`,
          },
       },
    },
