@@ -2,25 +2,21 @@ import "./style.css";
 
 const BackButton: React.FC<{}> = ({}) => {
    const goBack = () => {
-      // Get the current URL
       const currentURL = window.location.href;
-
-      // Remove trailing slash if it exists
       const urlWithoutTrailingSlash = currentURL.replace(/\/$/, "");
-
-      // Find the last occurrence of '/'
       const lastSlashIndex = urlWithoutTrailingSlash.lastIndexOf("/");
 
-      // If there's no slash or it's just the protocol slashes (http://), don't modify
       if (lastSlashIndex <= 7) {
          return;
       }
 
-      // Get the URL without the last segment
       const newURL = urlWithoutTrailingSlash.substring(0, lastSlashIndex);
 
-      // Update the URL and add to browser history
+      // Update URL in browser history
       window.history.pushState({}, "", newURL);
+
+      // Dispatch a popstate event to trigger route handling
+      window.dispatchEvent(new PopStateEvent("popstate"));
    };
 
    return (
