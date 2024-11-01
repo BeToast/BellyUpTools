@@ -19,6 +19,7 @@ import { getChartIdFromUrl } from "./utils/chartUrl";
 import PartyLinksToFirestore from "./context/PartyLinksToFirestore";
 import MicrosoftOAuth from "../shared/MicrosoftOAuth";
 import BackButton from "../shared/BackButton";
+import KitchenBathroom from "./compos/KitchenBathroom";
 
 function App() {
    const [chartId, setChartKey] = useState<string | null>(getChartIdFromUrl());
@@ -95,6 +96,7 @@ function App() {
                         <Tables />
                         <Seats />
                         <OverlayPrinter />
+                        <KitchenBathroom />
                      </main>
                      <div className="pixels200" />
                      <InfoContext />

@@ -1,0 +1,17 @@
+.kitchen-label {
+   position: absolute;
+   top: 80px;
+   left: 36px;
+
+   color: rgb(67, 66, 66);
+   font-size: 26px;
+}
+.bathroom-label {
+   position: absolute;
+   bottom: 340px;
+   right: -10px;
+   transform: rotate(-90deg);
+
+   color: rgb(67, 66, 66);
+   font-size: 26px;
+}
