@@ -128,7 +128,7 @@ const TableRailHandler: React.FC<{
                         x: kRailLeft,
                         y: kRailBottom,
                      },
-                     firstTableCenter,
+                     lastTableCenter,
                      tableRadius,
                      true
                   )}
@@ -141,7 +141,7 @@ const TableRailHandler: React.FC<{
                   <LineDiv
                      pointOne={{
                         x: tableLeft + 1,
-                        y: tableTop,
+                        y: tableTop + tableRadius,
                      }}
                      pointTwo={{
                         x: tableLeft + 1,
