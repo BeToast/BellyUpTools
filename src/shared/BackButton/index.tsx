@@ -12,11 +12,8 @@ const BackButton: React.FC<{}> = ({}) => {
 
       const newURL = urlWithoutTrailingSlash.substring(0, lastSlashIndex);
 
-      // Update URL in browser history
-      window.history.pushState({}, "", newURL);
-
-      // Dispatch a popstate event to trigger route handling
-      window.dispatchEvent(new PopStateEvent("popstate"));
+      // This will trigger a full page reload
+      window.location.href = newURL;
    };
 
    return (
