@@ -5,6 +5,7 @@ import "./App.css";
 import "../shared/firebase";
 import Pacing from "./compos/Pacing";
 import ResBuyers from "./compos/ResBuyers";
+import BackButton from "../shared/BackButton";
 
 declare module "jspdf" {
    interface jsPDF {
@@ -87,37 +88,46 @@ const App: React.FC = () => {
    };
 
    return (
-      <div className="horz-center">
-         <div className="App">
-            <div className="title-card">
-               <h1>BellyUp reportTools 📄</h1>
-               <p>
-                  <span style={{ fontStyle: "italic" }}>instant </span>Pacing
-                  and Res Buyers
-               </p>
-            </div>
-            <div className="card">
-               <h2>Choose BuyersReport.xls to upload from your computer</h2>
-               <input
-                  type="file"
-                  accept=".xls,.xlsx"
-                  onChange={handleFileUpload}
-                  className="file-input"
+      <>
+         <BackButton />
+         <div className="horz-center">
+            <div className="App">
+               <div className="title-card">
+                  <h1>BellyUp reportTools 📄</h1>
+                  <p>
+                     <span style={{ fontStyle: "italic" }}>instant </span>Pacing
+                     and Res Buyers
+                  </p>
+               </div>
+               <div className="card">
+                  <h2>Choose BuyersReport.xls to upload from your computer</h2>
+                  <input
+                     type="file"
+                     accept=".xls,.xlsx"
+                     onChange={handleFileUpload}
+                     className="file-input"
+                  />
+                  {loading && <p className="loading">Processing file...</p>}
+                  {error && <p className="error">{error}</p>}
+                  {fileName && (
+                     <p className="success">
+                        Successfully Uploaded: {fileName}
+                     </p>
+                  )}
+               </div>
+               <ResBuyers
+                  json={json}
+                  eventName={eventName}
+                  eventDate={eventDate}
                />
-               {loading && <p className="loading">Processing file...</p>}
-               {error && <p className="error">{error}</p>}
-               {fileName && (
-                  <p className="success">Successfully Uploaded: {fileName}</p>
-               )}
+               <Pacing
+                  json={json}
+                  eventName={eventName}
+                  eventDate={eventDate}
+               />
             </div>
-            <ResBuyers
-               json={json}
-               eventName={eventName}
-               eventDate={eventDate}
-            />
-            <Pacing json={json} eventName={eventName} eventDate={eventDate} />
          </div>
-      </div>
+      </>
    );
 };
 
