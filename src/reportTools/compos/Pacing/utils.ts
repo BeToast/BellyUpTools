@@ -22,6 +22,7 @@ export const calculateSalesPacing = (
    var presaleRes: number = 0;
    var presale: number = 0;
 
+   var earliestPresaleDate: Date;
    var firstDayPublicDate: Date;
 
    if (hadPresale) {
@@ -47,7 +48,7 @@ export const calculateSalesPacing = (
       presale = presaleGa + presaleRes;
 
       // Find the earliest presale date
-      const earliestPresaleDate: Date = json
+      earliestPresaleDate = json
          .filter((row) => row.Source === "Presale")
          .reduce((earliest, current) => {
             const currentDate = excelSerialDateToJSDate(current.Completed);
@@ -199,18 +200,20 @@ export const calculateSalesPacing = (
    }
 
    const eventNameDateLine = `${eventName} - ${eventDate.toDateString()}`;
-   const totalLine = `Total: ${total} (ga ${totalGa}, res ${totalRes})`;
-   const presaleLine = `Presale: ${
+   const totalLine = `Total - ${total} (${totalGa}ga, ${totalRes}res)`;
+   const presaleLine = `${
       hadPresale
-         ? `${presale} (ga ${presaleGa}, res ${presaleRes})`
+         ? `Presale(${
+              earliestPresaleDate!.getMonth() + 1
+           }/${earliestPresaleDate!.getDate()}) - ${presale} (${presaleGa}ga, ${presaleRes}res)`
          : "there was no presale"
    }`;
-   const firstDayPublicLine = `1st day public: ${firstDayPublic} (ga ${firstDayPublicGa}, res ${firstDayPublicRes})`;
-   const dosLine = `DOS: ${dos} (ga ${dosGa}, res ${dosRes})`;
+   const firstDayPublicLine = `1st day public - ${firstDayPublic} (${firstDayPublicGa}ga, ${firstDayPublicRes}res)`;
+   const dosLine = `DOS - ${dos} (${dosGa}ga, ${dosRes}res)`;
    const soldOutLine: string | null = soldOutDate
-      ? `Show sold out - ${soldOutDate.toDateString()}\nWaitlist: ${waitlist} (ga ${waitlistGa}, res ${waitlistRes})`
+      ? `Show sold out - ${soldOutDate.toDateString()}\nWaitlist - ${waitlist} (${waitlistGa}ga, ${waitlistRes}res)`
       : null;
-   const privateLine = `Private: ${private_} (ga ${privateGa}, res ${privateRes})`;
+   const privateLine = `Private - ${private_} (${privateGa}ga, ${privateRes}res)`;
 
    return `${eventNameDateLine}
 ${totalLine}
