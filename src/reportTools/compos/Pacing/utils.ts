@@ -105,7 +105,6 @@ export const calculateSalesPacing = (
    const firstDayPublic = firstDayPublicGa + firstDayPublicRes;
 
    // Calculate DOS (Day of Show) based on the event date in the file name
-
    const dosGa = json
       .filter((row) => {
          return (
@@ -181,23 +180,47 @@ export const calculateSalesPacing = (
 
    const waitlist = waitlistGa + waitlistRes;
 
-   // New code to check for "Hold Bank" and find the last public sale date
-   const hasHoldBank = json.some((row) => row.Source === "Hold_Bank");
-   let soldOutDate: Date | null = null;
+   // Track running totals for GA and Res
+   let runningGaTotal = 0;
+   let runningResTotal = 0;
+   let gaSoldOutDate: Date | null = null;
+   let resSoldOutDate: Date | null = null;
 
-   if (hasHoldBank) {
-      const lastPublicSaleDate = json
-         .filter((row) => row.Source === "_Public")
-         .reduce((latest, current) => {
-            const currentDate = excelSerialDateToJSDate(current.Completed);
-            return latest === null || currentDate > latest
-               ? currentDate
-               : latest;
-         }, null as Date | null);
-      if (lastPublicSaleDate) {
-         soldOutDate = lastPublicSaleDate;
+   // Sort the data by date
+   const sortedData = [...json].sort(
+      (a, b) =>
+         excelSerialDateToJSDate(a.Completed).getTime() -
+         excelSerialDateToJSDate(b.Completed).getTime()
+   );
+
+   // Find sold out dates by accumulating totals
+   for (const row of sortedData) {
+      const qty = parseInt(row.QTY?.toString() ?? "0", 10) || 0;
+
+      if (row["Ticket Type"] === "General Admission") {
+         runningGaTotal += qty;
+         if (runningGaTotal >= 370 && !gaSoldOutDate) {
+            gaSoldOutDate = excelSerialDateToJSDate(row.Completed);
+         }
+      } else if (row["Ticket Type"] === "Reserved") {
+         runningResTotal += qty;
+         if (runningResTotal >= 80 && !resSoldOutDate) {
+            resSoldOutDate = excelSerialDateToJSDate(row.Completed);
+         }
       }
    }
+
+   const gaSoldOutLine = gaSoldOutDate
+      ? `GA sold out (${
+           gaSoldOutDate.getMonth() + 1
+        }/${gaSoldOutDate.getDate()})`
+      : null;
+
+   const resSoldOutLine = resSoldOutDate
+      ? `RES sold out (${
+           resSoldOutDate.getMonth() + 1
+        }/${resSoldOutDate.getDate()})`
+      : null;
 
    const eventNameDateLine = `${eventName} - ${eventDate.toDateString()}`;
    const totalLine = `Total - ${total} (${totalGa}ga, ${totalRes}res)`;
@@ -210,9 +233,6 @@ export const calculateSalesPacing = (
    }`;
    const firstDayPublicLine = `1st day public - ${firstDayPublic} (${firstDayPublicGa}ga, ${firstDayPublicRes}res)`;
    const dosLine = `DOS - ${dos} (${dosGa}ga, ${dosRes}res)`;
-   const soldOutLine: string | null = soldOutDate
-      ? `Show sold out - ${soldOutDate.toDateString()}\nWaitlist - ${waitlist} (${waitlistGa}ga, ${waitlistRes}res)`
-      : null;
    const privateLine = `Private - ${private_} (${privateGa}ga, ${privateRes}res)`;
 
    return `${eventNameDateLine}
@@ -220,12 +240,16 @@ ${totalLine}
 ${presaleLine}
 ${firstDayPublicLine}
 ${
-   soldOutDate
-      ? soldOutDate < eventDate
-         ? `${soldOutLine}\n${dosLine}`
-         : `${dosLine}\n${soldOutLine}`
-      : dosLine
-}
+   gaSoldOutDate && resSoldOutDate
+      ? gaSoldOutDate < resSoldOutDate
+         ? `${gaSoldOutLine}\n${resSoldOutLine}\n`
+         : `${resSoldOutLine}\n${gaSoldOutLine}\n`
+      : gaSoldOutLine
+      ? `${gaSoldOutLine}\n`
+      : resSoldOutLine
+      ? `${resSoldOutLine}\n`
+      : ""
+}${dosLine}
 ${privateLine}
 `;
 };
