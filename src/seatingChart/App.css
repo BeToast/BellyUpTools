@@ -28,6 +28,11 @@
 }
 
 @media print {
+   html {
+      zoom: 100% !important;
+      -webkit-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+   }
    body {
       margin: 0;
       padding: 0;

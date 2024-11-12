@@ -32,6 +32,7 @@ const AbsolutePrinter: React.FC = () => {
       if (letterPaper) {
          setPaperRect(letterPaper.getBoundingClientRect());
       }
+      console.log("bong");
    }, []);
 
    const updateFlexieMargin = useCallback(() => {
@@ -48,11 +49,15 @@ const AbsolutePrinter: React.FC = () => {
       window.addEventListener("scroll", updateScrollTopAndPaperSize);
       window.addEventListener("resize", updateScrollTopAndPaperSize);
       window.addEventListener("resize", updatePaperRect);
+      window.addEventListener("beforeprint", updateScrollTopAndPaperSize);
+      window.addEventListener("beforeprint", updatePaperRect);
 
       return () => {
          window.removeEventListener("scroll", updateScrollTopAndPaperSize);
          window.removeEventListener("resize", updateScrollTopAndPaperSize);
          window.removeEventListener("resize", updatePaperRect);
+         window.removeEventListener("beforeprint", updateScrollTopAndPaperSize);
+         window.removeEventListener("beforeprint", updatePaperRect);
       };
    }, [updateScrollTopAndPaperSize, updatePaperRect, updateFlexieMargin]);
 

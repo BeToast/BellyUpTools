@@ -9,6 +9,8 @@ import PartyConnected from "./PartyConnected";
 import LoginInfo from "./LoginInfo";
 import WritingStatus from "./WritingStatus";
 import { UserCredential } from "firebase/auth";
+import BackButton from "../../../shared/BackButton";
+import PrintChart from "./PrintChart";
 
 const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    storedCredential,
@@ -250,6 +252,19 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       <>
          <div className="info-wrap no-print">
             <div className="status-box">
+               <div className="horz" style={{ width: "101%" }}>
+                  <BackButton
+                     style={{
+                        position: "relative",
+                        top: "0",
+                        left: "0",
+                        width: "50px",
+                        flexShrink: "0",
+                        margin: "2px",
+                     }}
+                  />
+                  <PrintChart />
+               </div>
                <LoginInfo storedCredential={storedCredential} />
                <WritingStatus />
             </div>

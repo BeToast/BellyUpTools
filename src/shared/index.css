@@ -14,7 +14,10 @@
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
 }
-
+.horz {
+   display: flex;
+   justify-content: start;
+}
 .horz-center {
    display: flex;
    justify-content: center;

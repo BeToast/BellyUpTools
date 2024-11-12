@@ -7,13 +7,13 @@ const WritingStatus: React.FC<{}> = ({}) => {
    return writing ? (
       <>
          <div className="writing-status writing">
-            <div className="writing-status-content">saving...</div>
+            <div className="writing-status-content">Saving...</div>
          </div>
       </>
    ) : (
       <>
          <div className="writing-status saved">
-            <div className="writing-status-content">all changes saved</div>
+            <div className="writing-status-content">All changes saved</div>
          </div>
       </>
    );

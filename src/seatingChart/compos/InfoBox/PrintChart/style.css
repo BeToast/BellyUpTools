@@ -1,0 +1,19 @@
+.print-chart {
+   width: 100%;
+   border: 2px solid #ccc;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   border-radius: 8px;
+   color: black;
+   background-color: rgb(125, 185, 227);
+   transition: all 0.3s;
+   display: flex;
+   align-items: center;
+}
+.print-chart:hover {
+   background-color: rgb(148, 203, 241);
+   border: 2px solid rgb(99, 172, 224);
+   cursor: pointer;
+}
+.print-chart-content {
+   padding: 12px 16px;
+}

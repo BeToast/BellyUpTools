@@ -1,6 +1,9 @@
+import { CSSProperties } from "react";
 import "./style.css";
 
-const BackButton: React.FC<{}> = ({}) => {
+const BackButton: React.FC<{ style?: CSSProperties }> = ({
+   style = undefined,
+}) => {
    const goBack = () => {
       const currentURL = window.location.href;
       const urlWithoutTrailingSlash = currentURL.replace(/\/$/, "");
@@ -18,7 +21,7 @@ const BackButton: React.FC<{}> = ({}) => {
 
    return (
       <>
-         <div className="back-button" onClick={goBack}>
+         <div className="back-button" style={style} onClick={goBack}>
             <svg
                xmlns="http://www.w3.org/2000/svg"
                width="40"

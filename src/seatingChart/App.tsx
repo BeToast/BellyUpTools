@@ -78,10 +78,11 @@ function App() {
 
    return (
       <>
-         <BackButton />
          {user ? (
             chartId === null ? (
                <>
+                  <BackButton />
+
                   <SelectChart
                      chartCollection={seatingChartCollection}
                      setChartKey={setChartKey}
