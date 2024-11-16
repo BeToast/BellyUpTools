@@ -28,10 +28,10 @@ const NameAndLines: React.FC<{
       // handle singles
       if (assigned && elements) {
          const hasKitchenSeats = elements.some((el) =>
-            el.id.match(/Seat k+\d/)
+            el.id.match(/Seat k-?\d+/)
          );
          const hasBathroomSeats = elements.some((el) =>
-            el.id.match(/Seat b+\d/)
+            el.id.match(/Seat b-?\d+/)
          );
          const tableCount = elements.filter((el) =>
             el.id.startsWith("Table ")
@@ -320,7 +320,13 @@ export const getReturnJsx = ({
 
    return (
       <React.Fragment>
-         {assignedUnPounded ? <div style={style}>{partyJsx}</div> : <></>}
+         {assignedUnPounded ? (
+            <div id={`${assignedUnPounded}`} style={style}>
+               {partyJsx}
+            </div>
+         ) : (
+            <></>
+         )}
          {linesJsx}
       </React.Fragment>
    );

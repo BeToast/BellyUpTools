@@ -32,7 +32,6 @@ const AbsolutePrinter: React.FC = () => {
       if (letterPaper) {
          setPaperRect(letterPaper.getBoundingClientRect());
       }
-      console.log("bong");
    }, []);
 
    const updateFlexieMargin = useCallback(() => {
@@ -86,7 +85,6 @@ const AbsolutePrinter: React.FC = () => {
                ...assignedArray,
             ];
             // NameAndLines with assignedArray and elementsArray
-
             return (
                <React.Fragment key={assignedArray[0]}>
                   <NameAndLines
