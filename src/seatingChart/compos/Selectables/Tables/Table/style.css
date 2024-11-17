@@ -39,6 +39,9 @@
 }
 
 @media print {
+   .table {
+      background-color: transparent;
+   }
    .table.selected {
       border: 2px dashed black;
    }
