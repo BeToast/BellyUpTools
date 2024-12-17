@@ -309,29 +309,28 @@ export const calculateSalesPacing = (
       .join("\n");
 
    return `${eventName} - ${eventDate.toDateString()}
-ga($${gaPrice?.price}, $${gaPrice?.fees})${
+      Prices: ga($${gaPrice?.price}, $${gaPrice?.fees})${
       resPrice ? ` res($${resPrice.price}, $${resPrice.fees})` : ""
    }${vipPrice ? ` vip($${vipPrice.price}, $${vipPrice.fees})` : ""}
-Total - ${formatTicketCount(total, totalGa, totalRes, totalVip)}
-${
-   hadPresale
-      ? `Presale(${
-           earliestPresaleDate!.getMonth() + 1
-        }/${earliestPresaleDate!.getDate()}) - ${formatTicketCount(
-           presale,
-           presaleGa,
-           presaleRes,
-           presaleVip
-        )}`
-      : "there was no presale"
-}
-1st day public - ${formatTicketCount(
-      firstDayPublic,
-      firstDayPublicGa,
-      firstDayPublicRes,
-      firstDayPublicVip
-   )}
-${soldOutDates}${
+      Total - ${formatTicketCount(total, totalGa, totalRes, totalVip)}
+      ${
+         hadPresale
+            ? `Presale(${
+                 earliestPresaleDate!.getMonth() + 1
+              }/${earliestPresaleDate!.getDate()}) - ${formatTicketCount(
+                 presale,
+                 presaleGa,
+                 presaleRes,
+                 presaleVip
+              )}`
+            : "there was no presale"
+      }
+      1st day public - ${formatTicketCount(
+         firstDayPublic,
+         firstDayPublicGa,
+         firstDayPublicRes,
+         firstDayPublicVip
+      )}${soldOutDates ? `\n${soldOutDates}` : ""}${
       dos > 0 ? `\nDOS - ${formatTicketCount(dos, dosGa, dosRes, dosVip)}` : ""
    }${
       private_ > 0
@@ -342,7 +341,10 @@ ${soldOutDates}${
               privateVip
            )}`
          : ""
-   }`;
+   }`
+      .split("\n")
+      .map((line) => line.trimStart())
+      .join("\n");
 };
 
 const areEqualByComponents = (date1: Date, date2: Date): boolean => {
