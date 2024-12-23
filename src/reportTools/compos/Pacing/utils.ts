@@ -15,11 +15,18 @@ export const calculateSalesPacing = (
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
-   const total = totalGa + totalRes;
+   const totalVip = json
+      .filter((row) => row["Ticket Type"] === "VIP")
+      .reduce(
+         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+         0
+      );
+   const total = totalGa + totalRes + totalVip;
 
    const hadPresale: boolean = json.some((row) => row.Source === "Presale");
    var presaleGa: number = 0;
    var presaleRes: number = 0;
+   var presaleVip: number = 0;
    var presale: number = 0;
 
    var earliestPresaleDate: Date;
@@ -45,9 +52,16 @@ export const calculateSalesPacing = (
             (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
             0
          );
-      presale = presaleGa + presaleRes;
+      presaleVip = json
+         .filter(
+            (row) => row.Source === "Presale" && row["Ticket Type"] === "VIP"
+         )
+         .reduce(
+            (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+            0
+         );
+      presale = presaleGa + presaleRes + presaleVip;
 
-      // Find the earliest presale date
       earliestPresaleDate = json
          .filter((row) => row.Source === "Presale")
          .reduce((earliest, current) => {
@@ -57,8 +71,7 @@ export const calculateSalesPacing = (
                : earliest;
          }, null as Date | null);
 
-      // Calculate first day public (one day after earliest presale)
-      firstDayPublicDate = new Date(earliestPresaleDate.getTime() + 86400000); // 86400000 ms = 1 day
+      firstDayPublicDate = new Date(earliestPresaleDate.getTime() + 86400000);
    } else {
       firstDayPublicDate = json
          .filter((row) => row.Source === "_Public")
@@ -102,9 +115,25 @@ export const calculateSalesPacing = (
          0
       );
 
-   const firstDayPublic = firstDayPublicGa + firstDayPublicRes;
+   const firstDayPublicVip = json
+      .filter((row) => {
+         return (
+            areEqualByComponents(
+               excelSerialDateToJSDate(row.Completed),
+               firstDayPublicDate
+            ) &&
+            row.Source === "_Public" &&
+            row["Ticket Type"] === "VIP"
+         );
+      })
+      .reduce(
+         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+         0
+      );
 
-   // Calculate DOS (Day of Show) based on the event date in the file name
+   const firstDayPublic =
+      firstDayPublicGa + firstDayPublicRes + firstDayPublicVip;
+
    const dosGa = json
       .filter((row) => {
          return (
@@ -133,7 +162,21 @@ export const calculateSalesPacing = (
          0
       );
 
-   const dos = dosGa + dosRes;
+   const dosVip = json
+      .filter((row) => {
+         return (
+            areEqualByComponents(
+               excelSerialDateToJSDate(row.Completed),
+               eventDate
+            ) && row["Ticket Type"] === "VIP"
+         );
+      })
+      .reduce(
+         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
+         0
+      );
+
+   const dos = dosGa + dosRes + dosVip;
 
    const privateGa = json
       .filter(
@@ -155,45 +198,31 @@ export const calculateSalesPacing = (
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
-
-   const private_ = privateGa + privateRes;
-
-   const waitlistGa = json
+   const privateVip = json
       .filter(
          (row) =>
-            row.Source === "Hold_Bank" &&
-            row["Ticket Type"] === "General Admission"
-      )
-      .reduce(
-         (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
-         0
-      );
-   const waitlistRes = json
-      .filter(
-         (row) =>
-            row.Source === "Hold_Bank" && row["Ticket Type"] === "Reserved"
+            row.Source === "Private_Purchase" && row["Ticket Type"] === "VIP"
       )
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
 
-   const waitlist = waitlistGa + waitlistRes;
+   const private_ = privateGa + privateRes + privateVip;
 
-   // Track running totals for GA and Res
    let runningGaTotal = 0;
    let runningResTotal = 0;
+   let runningVipTotal = 0;
    let gaSoldOutDate: Date | null = null;
    let resSoldOutDate: Date | null = null;
+   let vipSoldOutDate: Date | null = null;
 
-   // Sort the data by date
    const sortedData = [...json].sort(
       (a, b) =>
          excelSerialDateToJSDate(a.Completed).getTime() -
          excelSerialDateToJSDate(b.Completed).getTime()
    );
 
-   // Find sold out dates by accumulating totals
    for (const row of sortedData) {
       const qty = parseInt(row.QTY?.toString() ?? "0", 10) || 0;
 
@@ -207,51 +236,115 @@ export const calculateSalesPacing = (
          if (runningResTotal >= 80 && !resSoldOutDate) {
             resSoldOutDate = excelSerialDateToJSDate(row.Completed);
          }
+      } else if (row["Ticket Type"] === "VIP") {
+         runningVipTotal += qty;
+         if (runningVipTotal >= 50 && !vipSoldOutDate) {
+            vipSoldOutDate = excelSerialDateToJSDate(row.Completed);
+         }
       }
    }
 
-   const gaSoldOutLine = gaSoldOutDate
-      ? `GA sold out (${
-           gaSoldOutDate.getMonth() + 1
-        }/${gaSoldOutDate.getDate()})`
-      : null;
+   const getPriceAndFees = (type: string) => {
+      const ticket = json.find((row) => row["Ticket Type"] === type);
+      if (!ticket) return null;
+      const qty = parseInt(ticket.QTY?.toString() ?? "1", 10) || 1;
+      return {
+         price: parseFloat(ticket["Face Value"]?.toString() || "0") / qty,
+         fees: parseFloat(ticket["Fees"]?.toString() || "0") / qty,
+      };
+   };
 
-   const resSoldOutLine = resSoldOutDate
-      ? `RES sold out (${
-           resSoldOutDate.getMonth() + 1
-        }/${resSoldOutDate.getDate()})`
-      : null;
+   const gaPrice = getPriceAndFees("General Admission");
+   const resPrice = getPriceAndFees("Reserved");
+   const vipPrice = getPriceAndFees("VIP");
 
-   const eventNameDateLine = `${eventName} - ${eventDate.toDateString()}`;
-   const totalLine = `Total - ${total} (${totalGa}ga, ${totalRes}res)`;
-   const presaleLine = `${
-      hadPresale
-         ? `Presale(${
-              earliestPresaleDate!.getMonth() + 1
-           }/${earliestPresaleDate!.getDate()}) - ${presale} (${presaleGa}ga, ${presaleRes}res)`
-         : "there was no presale"
-   }`;
-   const firstDayPublicLine = `1st day public - ${firstDayPublic} (${firstDayPublicGa}ga, ${firstDayPublicRes}res)`;
-   const dosLine = `DOS - ${dos} (${dosGa}ga, ${dosRes}res)`;
-   const privateLine = `Private - ${private_} (${privateGa}ga, ${privateRes}res)`;
+   const formatTicketCount = (
+      total: number,
+      ga: number,
+      res: number,
+      vip: number
+   ) => {
+      if (total === 0) return "0";
+      const parts = [];
+      if (ga > 0) parts.push(`${ga}ga`);
+      if (res > 0) parts.push(`${res}res`);
+      if (vip > 0) parts.push(`${vip}vip`);
+      return `${total} (${parts.join(", ")})`;
+   };
 
-   return `${eventNameDateLine}
-${totalLine}
-${presaleLine}
-${firstDayPublicLine}
-${
-   gaSoldOutDate && resSoldOutDate
-      ? gaSoldOutDate < resSoldOutDate
-         ? `${gaSoldOutLine}\n${resSoldOutLine}\n`
-         : `${resSoldOutLine}\n${gaSoldOutLine}\n`
-      : gaSoldOutLine
-      ? `${gaSoldOutLine}\n`
-      : resSoldOutLine
-      ? `${resSoldOutLine}\n`
-      : ""
-}${dosLine}
-${privateLine}
-`;
+   const soldOutDates = [
+      ...(gaSoldOutDate
+         ? [
+              {
+                 date: gaSoldOutDate,
+                 line: `GA sold out (${
+                    gaSoldOutDate.getMonth() + 1
+                 }/${gaSoldOutDate.getDate()})`,
+              },
+           ]
+         : []),
+      ...(resSoldOutDate
+         ? [
+              {
+                 date: resSoldOutDate,
+                 line: `RES sold out (${
+                    resSoldOutDate.getMonth() + 1
+                 }/${resSoldOutDate.getDate()})`,
+              },
+           ]
+         : []),
+      ...(vipSoldOutDate
+         ? [
+              {
+                 date: vipSoldOutDate,
+                 line: `VIP sold out (${
+                    vipSoldOutDate.getMonth() + 1
+                 }/${vipSoldOutDate.getDate()})`,
+              },
+           ]
+         : []),
+   ]
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map(({ line }) => line)
+      .join("\n");
+
+   return `${eventName} - ${eventDate.toDateString()}
+      Prices: ga($${gaPrice?.price}, $${gaPrice?.fees})${
+      resPrice ? ` res($${resPrice.price}, $${resPrice.fees})` : ""
+   }${vipPrice ? ` vip($${vipPrice.price}, $${vipPrice.fees})` : ""}
+      Total - ${formatTicketCount(total, totalGa, totalRes, totalVip)}
+      ${
+         hadPresale
+            ? `Presale(${
+                 earliestPresaleDate!.getMonth() + 1
+              }/${earliestPresaleDate!.getDate()}) - ${formatTicketCount(
+                 presale,
+                 presaleGa,
+                 presaleRes,
+                 presaleVip
+              )}`
+            : "there was no presale"
+      }
+      1st day public - ${formatTicketCount(
+         firstDayPublic,
+         firstDayPublicGa,
+         firstDayPublicRes,
+         firstDayPublicVip
+      )}${soldOutDates ? `\n${soldOutDates}` : ""}${
+      dos > 0 ? `\nDOS - ${formatTicketCount(dos, dosGa, dosRes, dosVip)}` : ""
+   }${
+      private_ > 0
+         ? `\nPrivate - ${formatTicketCount(
+              private_,
+              privateGa,
+              privateRes,
+              privateVip
+           )}`
+         : ""
+   }`
+      .split("\n")
+      .map((line) => line.trimStart())
+      .join("\n");
 };
 
 const areEqualByComponents = (date1: Date, date2: Date): boolean => {
