@@ -1,0 +1,10 @@
+.warning-wrapper {
+   position: absolute;
+   top: calc(var(--seat-height) * -0.85);
+   left: calc(var(--seat-width) * 1.2);
+   display: flex;
+   gap: 4px;
+   justify-content: center;
+   align-items: center;
+   color: rgb(255, 40, 40);
+}

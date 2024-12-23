@@ -5,6 +5,7 @@ import Seat from "./Seat";
 import RemoveSeat from "./RemoveSeat";
 import "./style.css";
 import { useSelected } from "../../../context/SelectedContext";
+import EmptyAddedWarning from "./EmptyAddedWarning";
 
 const Seats = () => {
    const { state, extraChairs, setExtraChairs, setAssigned, firestoreLoaded } =
@@ -46,6 +47,9 @@ const Seats = () => {
                ref={state[`Seat k${kId}`].ref}
             />
             {kId < 1 && <RemoveSeat />}
+            {kId < 1 && state[`Seat k${kId}`].assigned.length === 0 && (
+               <EmptyAddedWarning />
+            )}
          </React.Fragment>
       );
    }

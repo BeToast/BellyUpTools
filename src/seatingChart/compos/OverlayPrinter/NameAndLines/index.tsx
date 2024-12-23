@@ -127,10 +127,6 @@ const NameAndLines: React.FC<{
                el.id.startsWith("Table ")
             ).length;
 
-            console.log(
-               `el: ${elementsLink[i]}\nk: ${hasKitchenSeats}\nb: ${hasBathroomSeats}\nt: ${tableCount}`
-            );
-
             //update linkedParties infos
             combinedHasKitchenSeats =
                combinedHasKitchenSeats || hasKitchenSeats; //or GATE
@@ -244,7 +240,6 @@ const NameAndLines: React.FC<{
             combinedTableCount > 0 &&
             (combinedHasKitchenSeats || combinedHasBathroomSeats)
          ) {
-            console.log("table rail yuh");
             outputJsx.push(
                <TableRailHandler
                   elements={elementsLink.flat()}
