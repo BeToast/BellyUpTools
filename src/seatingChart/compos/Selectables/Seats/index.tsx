@@ -1,5 +1,5 @@
+// Seats.tsx
 import React from "react";
-
 import AddSeat from "./AddSeat";
 import Seat from "./Seat";
 import RemoveSeat from "./RemoveSeat";
@@ -24,20 +24,32 @@ const Seats = () => {
       setExtraChairs(extraChairs + 1);
    };
 
+   // Helper function to calculate display number
+   const getDisplayNumber = (id: string, num: number): number => {
+      if (id.startsWith("k")) {
+         // Kitchen seats: Just show their actual number
+         return num + extraChairs;
+      } else if (id.startsWith("b")) {
+         // Bathroom seats: Show number + 16 + extra seats
+         return 31 + extraChairs - num;
+      }
+      return 0; // For invisible seats
+   };
+
    var kSeatsEls: Array<React.ReactNode> = [];
    for (var kId = 1 - extraChairs; kId < 17; kId++) {
-      // console.log(state[`Seat k${kId}`]);
       kSeatsEls.push(
          <React.Fragment key={kId}>
             <Seat
                id={`k${kId}`}
-               displayNumber={kId + extraChairs}
+               displayNumber={getDisplayNumber("k", kId)}
                ref={state[`Seat k${kId}`].ref}
             />
             {kId < 1 && <RemoveSeat />}
          </React.Fragment>
       );
    }
+
    var bSeatsEls: Array<React.ReactNode> = [];
    var bId = 14;
    while (state[`Seat b${bId}`]) {
@@ -45,7 +57,7 @@ const Seats = () => {
          <React.Fragment key={bId}>
             <Seat
                id={`b${bId}`}
-               displayNumber={bId}
+               displayNumber={getDisplayNumber("b", bId)}
                ref={state[`Seat b${bId}`].ref}
             />
          </React.Fragment>
