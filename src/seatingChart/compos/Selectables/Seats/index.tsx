@@ -75,19 +75,21 @@ const Seats = () => {
             <AddSeat addHandler={addKitchenSeatHandler} />
             <div style={{ height: "8px" }} />
             {kSeatsEls}
-            <Seat
+            <div style={{ height: "16px" }} />
+            {/* <Seat
                id={"nope"}
                displayNumber={0}
                invis={true}
                ref={React.createRef<HTMLDivElement>()}
-            />
+            /> */}
             <div className="seat-row">
-               <Seat
+               {/* <Seat
                   id={"nope"}
                   displayNumber={0}
                   invis={true}
                   ref={React.createRef<HTMLDivElement>()}
-               />
+               /> */}
+               <div style={{ width: "16px" }} />
                <Seat
                   id={"nope"}
                   displayNumber={0}

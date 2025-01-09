@@ -51,6 +51,10 @@
    .flexie {
       margin: 0px;
    }
+   .no-break {
+      break-inside: avoid;
+      page-break-inside: avoid; /* older browser support */
+   }
 }
 
 .no-select {

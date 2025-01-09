@@ -2,6 +2,7 @@
    background-color: white;
    border-radius: 8px;
    padding: 0 4px;
+   white-space: nowrap;
 }
 
 .party-divider {
@@ -13,6 +14,13 @@
    margin-right: 4px;
    z-index: 50;
 }
+@media print {
+   .party-divider {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+   }
+}
+
 .party-divider:last-child {
    display: none;
 }
