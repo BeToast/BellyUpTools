@@ -20,7 +20,7 @@ interface MicrosoftOAuthProps {
 const MicrosoftOAuth: React.FC<MicrosoftOAuthProps> = ({
    setStoredCredential,
 }) => {
-   const michaelEmailAddress = "note2bp@gmail.com";
+   const michaelEmailAddress = "mag@aerolease.com";
    const [error, setError] = useState<string | null>(null);
    const [isLoading, setIsLoading] = useState(false);
    const [showConfirmation, setShowConfirmation] = useState(false);
