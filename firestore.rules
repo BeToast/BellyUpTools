@@ -11,14 +11,19 @@ service cloud.firestore {
       return request.auth.token.email.matches(".*@bellyupaspen\\.com$");
     }
 
+    function isAllowedExternalUser() {
+      return request.auth.token.email == "mag@aerolease.com";
+    }
+
     // Default rule: deny all reads and writes
     match /{document=**} {
       allow read, write, delete: if false;
     }
 
     match /SeatingCharts/{document} {
-      // Only allow authenticated users with bellyupaspen.com domain
-      allow read, write, delete: if isAuthenticated() && hasValidDomain();
+      // Allow authenticated users with bellyupaspen.com domain OR mag@aerolease.com
+      allow read, write, delete: if isAuthenticated() && 
+        (hasValidDomain() || isAllowedExternalUser());
     }
   }
 }
