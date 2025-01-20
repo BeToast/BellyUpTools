@@ -68,3 +68,73 @@
 }
 .assigned {
 }
+
+.login-microsoft {
+   height: 40px;
+   width: 100%;
+   margin-top: 20px;
+   padding: 8px 12px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   font-weight: 500;
+   font-size: medium;
+
+   color: rgb(239, 239, 239);
+   background-color: #2a5dab;
+   border: 1px solid transparent;
+   border-radius: 8px;
+   cursor: pointer;
+
+   transition: all 0.3s;
+}
+
+.login-microsoft:not(:disabled):hover {
+   color: #07234d;
+   background-color: #c3d1e8;
+   border: 1px solid #07234d;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-microsoft:disabled {
+   background-color: #8da4cb;
+   color: #e0e0e0;
+   cursor: not-allowed;
+   pointer-events: none;
+}
+
+.confirm-action {
+   height: 40px;
+   width: 100%;
+   margin-top: 20px;
+   padding: 8px 12px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   font-weight: 500;
+   font-size: medium;
+
+   color: rgb(239, 239, 239);
+   background-color: #2e8a33;
+   border: 1px solid transparent;
+   border-radius: 8px;
+   cursor: pointer;
+
+   transition: all 0.3s;
+}
+
+.confirm-action:not(:disabled):hover {
+   color: #0d4010;
+   background-color: rgb(195, 238, 197);
+   border: 1px solid #0d4010;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-action:disabled {
+   background-color: #8fc392;
+   color: #e0e0e0;
+   cursor: not-allowed;
+   pointer-events: none;
+}
