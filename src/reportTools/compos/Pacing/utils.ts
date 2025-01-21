@@ -16,7 +16,7 @@ export const calculateSalesPacing = (
          0
       );
    const totalVip = json
-      .filter((row) => row["Ticket Type"] === "VIP")
+      .filter((row) => row["Ticket Type"]?.includes("VIP"))
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
@@ -54,7 +54,8 @@ export const calculateSalesPacing = (
          );
       presaleVip = json
          .filter(
-            (row) => row.Source === "Presale" && row["Ticket Type"] === "VIP"
+            (row) =>
+               row.Source === "Presale" && row?.["Ticket Type"]?.includes("VIP")
          )
          .reduce(
             (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -123,7 +124,7 @@ export const calculateSalesPacing = (
                firstDayPublicDate
             ) &&
             row.Source === "_Public" &&
-            row["Ticket Type"] === "VIP"
+            row?.["Ticket Type"]?.includes("VIP")
          );
       })
       .reduce(
@@ -168,7 +169,7 @@ export const calculateSalesPacing = (
             areEqualByComponents(
                excelSerialDateToJSDate(row.Completed),
                eventDate
-            ) && row["Ticket Type"] === "VIP"
+            ) && row?.["Ticket Type"]?.includes("VIP")
          );
       })
       .reduce(
@@ -201,7 +202,8 @@ export const calculateSalesPacing = (
    const privateVip = json
       .filter(
          (row) =>
-            row.Source === "Private_Purchase" && row["Ticket Type"] === "VIP"
+            row.Source === "Private_Purchase" &&
+            row?.["Ticket Type"]?.includes("VIP")
       )
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -236,7 +238,7 @@ export const calculateSalesPacing = (
          if (runningResTotal >= 80 && !resSoldOutDate) {
             resSoldOutDate = excelSerialDateToJSDate(row.Completed);
          }
-      } else if (row["Ticket Type"] === "VIP") {
+      } else if (row?.["Ticket Type"]?.includes("VIP")) {
          runningVipTotal += qty;
          if (runningVipTotal >= 50 && !vipSoldOutDate) {
             vipSoldOutDate = excelSerialDateToJSDate(row.Completed);
@@ -245,7 +247,11 @@ export const calculateSalesPacing = (
    }
 
    const getPriceAndFees = (type: string) => {
-      const ticket = json.find((row) => row["Ticket Type"] === type);
+      const ticket = json.find((row) =>
+         type === "VIP"
+            ? row["Ticket Type"]?.includes(type)
+            : row["Ticket Type"] === type
+      );
       if (!ticket) return null;
       const qty = parseInt(ticket.QTY?.toString() ?? "1", 10) || 1;
       return {
@@ -309,9 +315,9 @@ export const calculateSalesPacing = (
       .join("\n");
 
    return `${eventName} - ${eventDate.toDateString()}
-      Prices: ga($${gaPrice?.price}, $${gaPrice?.fees})${
-      resPrice ? ` res($${resPrice.price}, $${resPrice.fees})` : ""
-   }${vipPrice ? ` vip($${vipPrice.price}, $${vipPrice.fees})` : ""}
+      Prices: ga($${gaPrice?.price}, $${gaPrice?.fees}) res($${
+      resPrice?.price
+   }, $${resPrice?.fees}) vip($${vipPrice?.price}, $${vipPrice?.fees})
       Total - ${formatTicketCount(total, totalGa, totalRes, totalVip)}
       ${
          hadPresale
