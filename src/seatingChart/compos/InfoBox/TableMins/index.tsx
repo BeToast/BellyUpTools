@@ -33,7 +33,7 @@ const TableMins: React.FC<TableMinsProps> = ({
    header = "Table Minimum",
    manualTableMinToRender = undefined,
 }) => {
-   const { docTableMins, docRef } = useSelected();
+   const { docTableMins, docRef, setWriting } = useSelected();
    const [tableMins, setTableMins] = useState<TableMinsState>(
       docTableMins || {}
    );
@@ -75,7 +75,7 @@ const TableMins: React.FC<TableMinsProps> = ({
       }
 
       setTableMins(newTableMins);
-      updateFirestoreTableMins(docRef, newTableMins);
+      updateFirestoreTableMins(docRef, newTableMins, setWriting);
    };
 
    const partyKey = manualTableMinToRender
@@ -116,7 +116,11 @@ const TableMins: React.FC<TableMinsProps> = ({
                                  contractAmount: e.target.value,
                               };
                               setTableMins(newTableMins);
-                              updateFirestoreTableMins(docRef, newTableMins);
+                              updateFirestoreTableMins(
+                                 docRef,
+                                 newTableMins,
+                                 setWriting
+                              );
                            }}
                            className="min-input"
                         />
@@ -134,7 +138,11 @@ const TableMins: React.FC<TableMinsProps> = ({
                                  payableBy: e.target.value,
                               };
                               setTableMins(newTableMins);
-                              updateFirestoreTableMins(docRef, newTableMins);
+                              updateFirestoreTableMins(
+                                 docRef,
+                                 newTableMins,
+                                 setWriting
+                              );
                            }}
                            className="min-input"
                         />
@@ -153,7 +161,11 @@ const TableMins: React.FC<TableMinsProps> = ({
                                  ticketsPurchased: e.target.checked,
                               };
                               setTableMins(newTableMins);
-                              updateFirestoreTableMins(docRef, newTableMins);
+                              updateFirestoreTableMins(
+                                 docRef,
+                                 newTableMins,
+                                 setWriting
+                              );
                            }}
                         />
                      </div>
@@ -171,7 +183,11 @@ const TableMins: React.FC<TableMinsProps> = ({
                                  contractSigned: e.target.checked,
                               };
                               setTableMins(newTableMins);
-                              updateFirestoreTableMins(docRef, newTableMins);
+                              updateFirestoreTableMins(
+                                 docRef,
+                                 newTableMins,
+                                 setWriting
+                              );
                            }}
                         />
                      </div>
@@ -190,12 +206,12 @@ export default TableMins;
 export const updateFirestoreTableMins = async (
    docRef: DocumentReference,
    newTableMins: TableMinsState,
+   setWriting: React.Dispatch<React.SetStateAction<boolean>>,
    deleteMinKey?: string
 ): Promise<void> => {
    const newHash = hash(newTableMins);
    if (newHash === prevTableMinsHash) return;
 
-   const { setWriting } = useSelected();
    setWriting(true);
    prevTableMinsHash = newHash;
 
