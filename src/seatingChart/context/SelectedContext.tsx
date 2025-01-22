@@ -19,6 +19,7 @@ import {
    FlattenedPartyLink,
    reconstructPartyLinks,
 } from "./PartyLinksToFirestore/utils";
+import { TableMinsState } from "../compos/InfoBox/TableMins";
 export interface RecordValue {
    selected: boolean;
    assigned: Array<string>;
@@ -69,6 +70,11 @@ interface SelectedContextType {
    firestoreLoaded: boolean;
    writing: boolean;
    setWriting: React.Dispatch<React.SetStateAction<boolean>>;
+
+   docTableMins: TableMinsState | undefined;
+   setDocTableMins: React.Dispatch<
+      React.SetStateAction<TableMinsState | undefined>
+   >;
 }
 
 const SelectedContext = createContext<SelectedContextType>({
@@ -102,6 +108,8 @@ const SelectedContext = createContext<SelectedContextType>({
    firestoreLoaded: false,
    writing: false,
    setWriting: () => {},
+   docTableMins: undefined,
+   setDocTableMins: () => {},
 });
 
 export const SelectedProvider: React.FC<{
@@ -115,12 +123,17 @@ export const SelectedProvider: React.FC<{
       undefined
    );
 
+   const [docTableMins, setDocTableMins] = useState<TableMinsState | undefined>(
+      undefined
+   );
+
    const [firestoreLoaded, setFirestoreLoaded] = useState<boolean>(false);
 
    const prevHashRef = useRef({
       inputs: 0,
       state: 0,
       partyLinks: 0,
+      tableMins: 0,
    });
 
    useEffect(() => {
@@ -157,6 +170,14 @@ export const SelectedProvider: React.FC<{
                   if (newHash !== prevHashRef.current.partyLinks) {
                      setPartyLinks(reconstructedLinks);
                      prevHashRef.current.partyLinks = newHash;
+                  }
+               }
+
+               if (data.tableMins) {
+                  const newHash = hash(data.tableMins);
+                  if (newHash !== prevHashRef.current.tableMins) {
+                     setDocTableMins(data.tableMins);
+                     prevHashRef.current.tableMins = newHash;
                   }
                }
             }
@@ -206,7 +227,7 @@ export const SelectedProvider: React.FC<{
    }, [state]);
 
    const [extraChairs, setExtraChairs] = useState<number>(0);
-   const [keyToRemove, setKeyToRemove] = useState<string | null>(null);
+   // const [keyToRemove, setKeyToRemove] = useState<string | null>(null);
 
    const [unlinkedPartiesArray, setUnlinkedPartiesArray] = useState<
       Array<Array<Array<string>>>
@@ -531,6 +552,8 @@ export const SelectedProvider: React.FC<{
       firestoreLoaded,
       writing,
       setWriting,
+      docTableMins,
+      setDocTableMins,
    };
 
    return (

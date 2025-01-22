@@ -11,6 +11,8 @@ import WritingStatus from "./WritingStatus";
 import { UserCredential } from "firebase/auth";
 import BackButton from "../../../shared/BackButton";
 import PrintChart from "./PrintChart";
+// import ToggleSwitch from "../../../shared/ToggleSwitch";
+import TableMins, { updateFirestoreTableMins } from "./TableMins";
 
 const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    storedCredential,
@@ -28,6 +30,9 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       // setPartyLinks,
       addPartyLink,
       removePartyLink,
+      docTableMins,
+      setDocTableMins,
+      docRef,
    } = useSelected();
 
    //for forced re-render
@@ -58,6 +63,10 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    // used for input fields
    const [partyName, setPartyName] = useState<string>("");
    const [partySize, setPartySize] = useState<number | undefined>(undefined);
+
+   const [manualTableMinToRender, setManualTableMinToRender] = useState<
+      string | undefined
+   >(undefined);
 
    // syncs infoBox state with SelectedContext state
    useEffect(() => {
@@ -151,37 +160,71 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
 
    const addPartyHandler = (name: string, size: number | undefined): void => {
       const newParty = `${name.trim()}(${size ? size : 1})`;
-      setPartyName(""); // Clear the input after adding
-      setPartySize(undefined); // Reset party count
+      const newParties = [...parties, newParty];
+      const newPartiesKey = newParties.join(",");
+
+      if (docTableMins && parties.length > 0) {
+         const oldPartiesKey = parties.join(",");
+         const newTableMins = { ...docTableMins };
+         if (docTableMins[oldPartiesKey]) {
+            newTableMins[newPartiesKey] = docTableMins[oldPartiesKey];
+            delete newTableMins[oldPartiesKey];
+            setDocTableMins(newTableMins);
+            setManualTableMinToRender(oldPartiesKey);
+            updateFirestoreTableMins(docRef, newTableMins, oldPartiesKey).then(
+               () => setManualTableMinToRender(undefined)
+            );
+         }
+      }
+
+      setPartyName("");
+      setPartySize(undefined);
 
       var otherParty: Array<string> | undefined = undefined;
-      const newParties = [...parties, newParty];
+
       if (linkedArrayIndex !== -1) {
          otherParty = removePartyLink(parties, linkedArrayIndex);
          if (otherParty) {
             addPartyLink(newParties, otherParty);
          }
       }
+
       setParties(newParties);
    };
 
    const removePartyHandler = (party: string) => {
       const newParties = parties.filter((p) => p !== party);
+      const oldPartyKey = parties.join(",");
+      const newPartyKey = newParties.join(",");
 
-      //find index of linked parties
+      // Update tableMins
+      if (docTableMins) {
+         const newTableMins = { ...docTableMins };
+         if (newParties.length === 0) {
+            delete newTableMins[oldPartyKey];
+         } else if (docTableMins[oldPartyKey]) {
+            newTableMins[newPartyKey] = docTableMins[oldPartyKey];
+            delete newTableMins[oldPartyKey];
+         }
+         setDocTableMins(newTableMins);
+         setManualTableMinToRender(oldPartyKey);
+         updateFirestoreTableMins(docRef, newTableMins, oldPartyKey).then(() =>
+            setManualTableMinToRender(undefined)
+         );
+      }
+
       const partyLinkIndex = partyLinks.findIndex((link) =>
          link.some((assigned) => arraysEqual(parties, assigned))
       );
 
       var otherParty: Array<string> | undefined = undefined;
-      //if it is linked remove the link
       if (partyLinkIndex !== -1) {
          otherParty = removePartyLink(parties, partyLinkIndex);
          if (otherParty && newParties.length > 0) {
             addPartyLink(newParties, otherParty);
          }
       }
-      //update state
+
       setParties(newParties);
    };
 
@@ -350,6 +393,16 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                   ) : (
                      <></>
                   )}
+                  {/* table contract section */}
+                  {tableCount > 0 && parties.length > 0 ? (
+                     <TableMins
+                        parties={parties}
+                        manualTableMinToRender={manualTableMinToRender}
+                     />
+                  ) : (
+                     <></>
+                  )}
+
                   {/* deselect */}
                   {selectedCount > 0 ? (
                      <button

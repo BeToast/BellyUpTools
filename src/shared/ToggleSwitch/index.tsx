@@ -3,6 +3,7 @@ import React from "react";
 import "./style.css";
 
 interface ToggleSwitchProps {
+   style?: React.CSSProperties;
    checked?: boolean;
    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
    disabled?: boolean;
@@ -10,13 +11,14 @@ interface ToggleSwitchProps {
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
+   style = {},
    checked,
    onChange,
    disabled,
    id,
 }) => {
    return (
-      <label className="toggle-switch">
+      <label className="toggle-switch" style={style}>
          <input
             type="checkbox"
             checked={checked}

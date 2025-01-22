@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./style.css";
 import { useSelected } from "../../context/SelectedContext";
-import { DocumentData, setDoc } from "firebase/firestore";
+import { setDoc } from "firebase/firestore";
 
 export interface InputsState {
    show: string;

@@ -18,15 +18,16 @@
 
 .info-wrap-fixed {
    position: fixed;
-   top: 32px;
+   top: 16px;
    bottom: 16px;
    gap: 8px;
-   margin-top: 204px;
-   height: calc(100vh - 204px);
+   margin-top: 180px;
+   height: calc(100vh - 180px);
    width: var(--info-width);
    display: flex;
    flex-direction: column;
    justify-content: start;
+   overflow-y: auto;
 }
 
 /* .info-box-grow {
