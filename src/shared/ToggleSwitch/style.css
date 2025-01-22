@@ -1,0 +1,60 @@
+:root {
+   --green-colour: #82cd83;
+   --red-colour: rgb(249, 97, 97);
+}
+
+.toggle-switch {
+   position: relative;
+   display: inline-block;
+   width: 42px;
+   height: 26px;
+   pointer-events: all;
+}
+
+.toggle-switch input {
+   opacity: 0;
+   width: 0;
+   height: 0;
+}
+
+.toggle-switch .slider {
+   position: absolute;
+   cursor: pointer;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background-color: var(--red-colour);
+   transition: 0.5s;
+   border-radius: 26px;
+}
+
+.toggle-switch .slider:before {
+   position: absolute;
+   content: "";
+   height: 22px;
+   width: 22px;
+   left: 2px;
+   bottom: 2px;
+   background-color: white;
+   transition: 0.3s;
+   border-radius: 50%;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .slider {
+   background-color: var(--green-colour);
+}
+
+.toggle-switch input:checked + .slider:before {
+   transform: translateX(16px);
+}
+
+.toggle-switch input:focus + .slider {
+   box-shadow: 0 0 1px var(--green-colour);
+}
+
+.toggle-switch input:disabled + .slider {
+   opacity: 0.5;
+   cursor: not-allowed;
+}
