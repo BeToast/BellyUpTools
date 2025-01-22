@@ -194,6 +194,9 @@ export const updateFirestoreTableMins = async (
 ): Promise<void> => {
    const newHash = hash(newTableMins);
    if (newHash === prevTableMinsHash) return;
+
+   const { setWriting } = useSelected();
+   setWriting(true);
    prevTableMinsHash = newHash;
 
    if (updateTimeout) {
@@ -217,8 +220,10 @@ export const updateFirestoreTableMins = async (
             };
 
             await updateDoc(docRef, updateData);
+            setWriting(false);
             resolve();
          } catch (error) {
+            setWriting(false);
             console.error("Error updating Firestore:", error);
             throw error;
          }
