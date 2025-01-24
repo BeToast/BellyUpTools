@@ -4,15 +4,17 @@ import { deleteField, DocumentReference, updateDoc } from "firebase/firestore";
 import { useSelected } from "../../../context/SelectedContext";
 import ToggleSwitch from "../../../../shared/ToggleSwitch";
 import { hash } from "../../../utils/generic";
+import { getTableMinStatus } from "./utils";
 
 export interface TableMinsState {
-   [partyKey: string]: {
-      hasMin: boolean;
-      ticketsPurchased: boolean;
-      contractAmount: string;
-      contractSigned: boolean;
-      payableBy: string;
-   };
+   [partyKey: string]: tableMinValue;
+}
+export interface tableMinValue {
+   hasMin: boolean;
+   ticketsPurchased: boolean;
+   contractAmount: string;
+   contractSigned: boolean;
+   payableBy: string;
 }
 
 interface TableMinsProps {
@@ -26,6 +28,8 @@ interface TableMinsProps {
 let prevTableMinsHash: number = 0;
 let updateTimeout: NodeJS.Timeout | null = null;
 
+const _DEBUG = false;
+
 const TableMins: React.FC<TableMinsProps> = ({
    parties,
    className = "",
@@ -33,26 +37,100 @@ const TableMins: React.FC<TableMinsProps> = ({
    header = "Table Minimum",
    manualTableMinToRender = undefined,
 }) => {
-   const { docTableMins, docRef, setWriting } = useSelected();
+   if (_DEBUG)
+      console.log("[TableMins] Component rendered with parties:", parties);
+
+   const {
+      assignedState,
+      docTableMins,
+      docRef,
+      setTableMinStatues,
+      setWriting,
+   } = useSelected();
    const [tableMins, setTableMins] = useState<TableMinsState>(
       docTableMins || {}
    );
 
    useEffect(() => {
       if (docTableMins) {
+         if (_DEBUG)
+            console.log("[TableMins] docTableMins updated:", docTableMins);
          setTableMins(docTableMins);
       }
    }, [docTableMins]);
 
    useEffect(() => {
+      if (_DEBUG) console.log("[TableMins] Starting status update");
+      console.time("updateTableMinStatuses");
+      updateTableMinStatuses();
+      console.timeEnd("updateTableMinStatuses");
+   }, [tableMins, assignedState]);
+
+   const updateTableMinStatuses = () => {
+      setTableMinStatues((prev) => {
+         const newStatuses: Record<string, string> = {};
+
+         if (!tableMins || !assignedState) return prev;
+
+         const numbersMap = new Map<string, number[]>();
+
+         // setup numbers
+         Object.entries(assignedState).forEach(([tableId, parties]) => {
+            if (!tableId.startsWith("Table") || parties.length == 0) return; //skip if not table
+
+            const joinedParties = parties.join(","); //join parties
+            numbersMap.set(
+               joinedParties,
+               numbersMap.get(joinedParties)
+                  ? [
+                       ...numbersMap.get(joinedParties)!,
+                       parseInt(tableId.slice(-2)),
+                    ]
+                  : [parseInt(tableId.slice(-2))]
+            );
+         });
+
+         // set values
+         numbersMap.forEach((tableNums, joinedParties) => {
+            tableNums.sort((a, b) => a - b);
+            const midIndex = Math.ceil((tableNums.length - 1) / 2);
+
+            tableNums.forEach(() => {
+               tableNums.forEach((num, index) => {
+                  if (index === midIndex) {
+                     //if index to print min at
+                     newStatuses[`Table ${num}`] = getTableMinStatus(
+                        tableMins[joinedParties],
+                        true
+                     );
+                  } else {
+                     newStatuses[`Table ${num}`] = getTableMinStatus(
+                        tableMins[joinedParties],
+                        false
+                     );
+                  }
+               });
+            });
+         });
+         return newStatuses;
+      });
+   };
+
+   useEffect(() => {
       return () => {
          if (updateTimeout) {
+            if (_DEBUG)
+               console.log("[TableMins] Cleanup: clearing update timeout");
             clearTimeout(updateTimeout);
          }
       };
    }, []);
 
    const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (_DEBUG)
+         console.log("[TableMins] Toggle changed:", event.target.checked);
+      const startTime = performance.now();
+
       const isChecked = event.target.checked;
       const partyKey = parties.join(",");
       const newTableMins = { ...tableMins };
@@ -75,6 +153,13 @@ const TableMins: React.FC<TableMinsProps> = ({
       }
 
       setTableMins(newTableMins);
+      if (_DEBUG)
+         console.log(
+            "[TableMins] State update took:",
+            performance.now() - startTime,
+            "ms"
+         );
+
       updateFirestoreTableMins(docRef, newTableMins, setWriting);
    };
 
@@ -110,12 +195,23 @@ const TableMins: React.FC<TableMinsProps> = ({
                            type="text"
                            value={tableMins[partyKey]?.contractAmount || ""}
                            onChange={(e) => {
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Contract amount changed"
+                                 );
+                              const startTime = performance.now();
                               const newTableMins = { ...tableMins };
                               newTableMins[partyKey] = {
                                  ...newTableMins[partyKey],
                                  contractAmount: e.target.value,
                               };
                               setTableMins(newTableMins);
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Contract amount update took:",
+                                    performance.now() - startTime,
+                                    "ms"
+                                 );
                               updateFirestoreTableMins(
                                  docRef,
                                  newTableMins,
@@ -132,12 +228,21 @@ const TableMins: React.FC<TableMinsProps> = ({
                            type="text"
                            value={tableMins[partyKey]?.payableBy || ""}
                            onChange={(e) => {
+                              if (_DEBUG)
+                                 console.log("[TableMins] Payable by changed");
+                              const startTime = performance.now();
                               const newTableMins = { ...tableMins };
                               newTableMins[partyKey] = {
                                  ...newTableMins[partyKey],
                                  payableBy: e.target.value,
                               };
                               setTableMins(newTableMins);
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Payable by update took:",
+                                    performance.now() - startTime,
+                                    "ms"
+                                 );
                               updateFirestoreTableMins(
                                  docRef,
                                  newTableMins,
@@ -155,12 +260,23 @@ const TableMins: React.FC<TableMinsProps> = ({
                               tableMins[partyKey]?.ticketsPurchased || false
                            }
                            onChange={(e) => {
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Tickets purchased changed"
+                                 );
+                              const startTime = performance.now();
                               const newTableMins = { ...tableMins };
                               newTableMins[partyKey] = {
                                  ...newTableMins[partyKey],
                                  ticketsPurchased: e.target.checked,
                               };
                               setTableMins(newTableMins);
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Tickets purchased update took:",
+                                    performance.now() - startTime,
+                                    "ms"
+                                 );
                               updateFirestoreTableMins(
                                  docRef,
                                  newTableMins,
@@ -170,19 +286,30 @@ const TableMins: React.FC<TableMinsProps> = ({
                         />
                      </div>
 
-                     <div className="label-wrapper">
+                     <div className="min-wrapper">
                         <div className="min-label">Contract Signed</div>
                         <ToggleSwitch
                            checked={
                               tableMins[partyKey]?.contractSigned || false
                            }
                            onChange={(e) => {
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Contract signed changed"
+                                 );
+                              const startTime = performance.now();
                               const newTableMins = { ...tableMins };
                               newTableMins[partyKey] = {
                                  ...newTableMins[partyKey],
                                  contractSigned: e.target.checked,
                               };
                               setTableMins(newTableMins);
+                              if (_DEBUG)
+                                 console.log(
+                                    "[TableMins] Contract signed update took:",
+                                    performance.now() - startTime,
+                                    "ms"
+                                 );
                               updateFirestoreTableMins(
                                  docRef,
                                  newTableMins,
@@ -209,19 +336,28 @@ export const updateFirestoreTableMins = async (
    setWriting: React.Dispatch<React.SetStateAction<boolean>>,
    deleteMinKey?: string
 ): Promise<void> => {
+   if (_DEBUG) console.log("[Firestore] Starting update process");
+   console.time("firestoreUpdate");
+
    const newHash = hash(newTableMins);
-   if (newHash === prevTableMinsHash) return;
+   if (newHash === prevTableMinsHash) {
+      if (_DEBUG) console.log("[Firestore] Update skipped - same hash");
+      return;
+   }
 
    setWriting(true);
    prevTableMinsHash = newHash;
 
    if (updateTimeout) {
+      if (_DEBUG) console.log("[Firestore] Clearing previous timeout");
       clearTimeout(updateTimeout);
    }
 
    return new Promise((resolve) => {
+      if (_DEBUG) console.log("[Firestore] Setting timeout for update");
       updateTimeout = setTimeout(async () => {
          try {
+            if (_DEBUG) console.log("[Firestore] Preparing update data");
             const updateData = {
                ...(deleteMinKey && {
                   [`tableMins.${deleteMinKey}`]: deleteField(),
@@ -235,12 +371,23 @@ export const updateFirestoreTableMins = async (
                ),
             };
 
+            if (_DEBUG) console.log("[Firestore] Sending update to Firestore");
+            const updateStart = performance.now();
             await updateDoc(docRef, updateData);
+            if (_DEBUG)
+               console.log(
+                  "[Firestore] Update completed in:",
+                  performance.now() - updateStart,
+                  "ms"
+               );
+
             setWriting(false);
+            console.timeEnd("firestoreUpdate");
             resolve();
          } catch (error) {
+            console.error("[Firestore] Error updating:", error);
+            console.timeEnd("firestoreUpdate");
             setWriting(false);
-            console.error("Error updating Firestore:", error);
             throw error;
          }
       }, 1000);

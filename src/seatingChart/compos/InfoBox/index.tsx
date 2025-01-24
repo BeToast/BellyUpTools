@@ -27,12 +27,12 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       setAssigned,
       setSelected,
       partyLinks,
-      // setPartyLinks,
       addPartyLink,
       removePartyLink,
       docTableMins,
       setDocTableMins,
       docRef,
+      setWriting,
    } = useSelected();
 
    //for forced re-render
@@ -171,9 +171,12 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
             delete newTableMins[oldPartiesKey];
             setDocTableMins(newTableMins);
             setManualTableMinToRender(oldPartiesKey);
-            updateFirestoreTableMins(docRef, newTableMins, oldPartiesKey).then(
-               () => setManualTableMinToRender(undefined)
-            );
+            updateFirestoreTableMins(
+               docRef,
+               newTableMins,
+               setWriting,
+               oldPartiesKey
+            ).then(() => setManualTableMinToRender(undefined));
          }
       }
 
@@ -208,9 +211,12 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
          }
          setDocTableMins(newTableMins);
          setManualTableMinToRender(oldPartyKey);
-         updateFirestoreTableMins(docRef, newTableMins, oldPartyKey).then(() =>
-            setManualTableMinToRender(undefined)
-         );
+         updateFirestoreTableMins(
+            docRef,
+            newTableMins,
+            setWriting,
+            oldPartyKey
+         ).then(() => setManualTableMinToRender(undefined));
       }
 
       const partyLinkIndex = partyLinks.findIndex((link) =>
@@ -400,7 +406,9 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                         manualTableMinToRender={manualTableMinToRender}
                      />
                   ) : (
-                     <></>
+                     <div style={{ display: "none" }}>
+                        <TableMins parties={[]} />
+                     </div>
                   )}
 
                   {/* deselect */}

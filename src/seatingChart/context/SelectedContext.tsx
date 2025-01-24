@@ -75,6 +75,10 @@ interface SelectedContextType {
    setDocTableMins: React.Dispatch<
       React.SetStateAction<TableMinsState | undefined>
    >;
+   tableMinStatues: Record<string, string>;
+   setTableMinStatues: React.Dispatch<
+      React.SetStateAction<Record<string, string>>
+   >;
 }
 
 const SelectedContext = createContext<SelectedContextType>({
@@ -110,6 +114,8 @@ const SelectedContext = createContext<SelectedContextType>({
    setWriting: () => {},
    docTableMins: undefined,
    setDocTableMins: () => {},
+   tableMinStatues: {},
+   setTableMinStatues: () => {},
 });
 
 export const SelectedProvider: React.FC<{
@@ -521,6 +527,10 @@ export const SelectedProvider: React.FC<{
       []
    );
 
+   const [tableMinStatues, setTableMinStatues] = useState<
+      Record<string, string>
+   >({});
+
    const value: SelectedContextType = {
       state,
       setState,
@@ -554,6 +564,8 @@ export const SelectedProvider: React.FC<{
       setWriting,
       docTableMins,
       setDocTableMins,
+      tableMinStatues,
+      setTableMinStatues,
    };
 
    return (
