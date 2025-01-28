@@ -29,6 +29,7 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       partyLinks,
       addPartyLink,
       removePartyLink,
+      writing,
       docTableMins,
       setDocTableMins,
       docRef,
@@ -413,12 +414,21 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
 
                   {/* deselect */}
                   {selectedCount > 0 ? (
-                     <button
-                        onClick={deselectHandler}
-                        className="deselect-button"
-                     >
-                        Done
-                     </button>
+                     writing ? (
+                        <button
+                           onClick={deselectHandler}
+                           className="deselect-button writing"
+                        >
+                           Saving... Please wait
+                        </button>
+                     ) : (
+                        <button
+                           onClick={deselectHandler}
+                           className="deselect-button"
+                        >
+                           Done
+                        </button>
+                     )
                   ) : (
                      <></>
                   )}
