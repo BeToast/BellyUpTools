@@ -59,9 +59,6 @@
 }
 
 @media print {
-   .table {
-      background-color: transparent;
-   }
    .table.selected {
       border: 2px dashed black;
    }
@@ -74,6 +71,11 @@
    .table.vacant:hover {
       border: 2px dashed black;
       box-shadow: none;
+   }
+   .table.CONFIRMED,
+   .table.INCOMPLETE {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
    }
 }
 
