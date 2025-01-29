@@ -4,8 +4,11 @@ import ToggleSwitch from "../../../../shared/ToggleSwitch";
 
 const _DEBUG = false;
 
-const Goldberg: React.FC<{}> = ({}) => {
-   const {} = useSelected();
+const Goldberg: React.FC<{ aSelectedTable: string; parties: string[] }> = ({
+   aSelectedTable,
+   // parties,
+}) => {
+   const { state, setGoldberg } = useSelected();
 
    return (
       <>
@@ -19,9 +22,14 @@ const Goldberg: React.FC<{}> = ({}) => {
          >
             <div className="absolute">
                <div className="header horz">
-                  Goldberg Table
+                  Goldberg
                   <div style={{ marginTop: "2px", marginLeft: "6px" }}>
-                     <ToggleSwitch checked={false} onChange={() => {}} />
+                     <ToggleSwitch
+                        checked={state[aSelectedTable]?.goldberg || false}
+                        onChange={(event) => {
+                           setGoldberg(aSelectedTable, event.target.checked);
+                        }}
+                     />
                   </div>
                </div>
             </div>

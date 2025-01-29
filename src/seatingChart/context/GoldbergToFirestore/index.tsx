@@ -2,15 +2,14 @@ import React, { useEffect, useCallback } from "react";
 import { useSelected } from "../SelectedContext";
 import { setDoc } from "firebase/firestore";
 
-const StateToFirestore: React.FC = () => {
-   const { assignedState, docRef, firestoreLoaded, setWriting } = useSelected();
+const GoldbergToFirestore: React.FC = () => {
+   const { goldbergState, docRef, firestoreLoaded, setWriting } = useSelected();
 
    const syncToFirestore = useCallback(async () => {
       if (!firestoreLoaded || !docRef) return;
-
       const setDocPromise = setDoc(
          docRef,
-         { state: assignedState },
+         { goldberg: goldbergState },
          { merge: true }
       )
          .then(() => console.log("Write to Firestore complete"))
@@ -20,19 +19,17 @@ const StateToFirestore: React.FC = () => {
       setWriting(true);
       await setDocPromise;
       setWriting(false);
-   }, [assignedState, docRef, firestoreLoaded]);
+   }, [goldbergState, docRef, firestoreLoaded]);
 
    useEffect(() => {
       if (!firestoreLoaded) {
          return undefined;
       }
-      console.log(
-         `assignedState changed or keyToRemove set, syncing to Firestore`
-      );
+      // console.log(`goldbergState changed, syncing to Firestore`);
       syncToFirestore();
-   }, [assignedState, syncToFirestore, firestoreLoaded]);
+   }, [goldbergState, syncToFirestore, firestoreLoaded]);
 
    return null;
 };
 
-export default StateToFirestore;
+export default GoldbergToFirestore;

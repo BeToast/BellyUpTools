@@ -35,6 +35,14 @@
    border: 1px solid black;
    z-index: 10;
 }
+.seat.goldberg {
+   background-color: #ffdf2c;
+   border: 1px solid #c9ab00;
+}
+.seat.selected.goldberg {
+   background-color: #ffdf2c;
+   border: 1px solid black;
+}
 
 .seat-id {
    color: black;

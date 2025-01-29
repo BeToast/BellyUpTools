@@ -45,6 +45,7 @@ export const handleElementClick = (
    selectedIds: Array<string>,
    thisAssignments: string[],
    selectedAssignments: string[],
+   setState: React.Dispatch<React.SetStateAction<Record<string, RecordValue>>>,
    setSelected: (id: string, selected: boolean) => void,
    selectGroup: (id: string) => void,
    deselectAll: () => void,
@@ -55,11 +56,24 @@ export const handleElementClick = (
       thisParty: Array<string>,
       index?: number
    ) => Array<string> | undefined
+   // setGoldberg: (id: string, goldberg: boolean) => void,
+   // removeGoldberg: (id: string) => void
 ) => {
    if (elementSelectState === SelectState.VACANT) {
       if (selectedAssignments.length > 0) {
-         //set assigned to other selected elemnts assignment
-         setAssigned(id, selectedAssignments);
+         //setState to assign partys to new selection and goldberg state
+         setState((prev) => {
+            const newState = {
+               ...prev,
+               [id]: {
+                  selected: true,
+                  goldberg: prev[selectedIds[0]].goldberg,
+                  assigned: selectedAssignments,
+                  ref: prev[id].ref,
+               },
+            };
+            return newState;
+         });
       } else {
          //if none selected. then ovveride with InfoBox party state
          setPartyOveride(true);
@@ -67,8 +81,18 @@ export const handleElementClick = (
       //update state to selected
       setSelected(id, true);
    } else if (elementSelectState === SelectState.SELECTED) {
-      setSelected(id, false);
-      setAssigned(id, selectedAssignments);
+      // deselect and remove assignments
+      setState((prev) => {
+         return {
+            ...prev,
+            [id]: {
+               selected: false,
+               goldberg: prev[id].goldberg,
+               assigned: selectedAssignments,
+               ref: prev[id].ref,
+            },
+         };
+      });
    } else if (elementSelectState === SelectState.ASSIGNED) {
       deselectAll();
       // updateInfoBoxParties([]);]
@@ -79,8 +103,20 @@ export const handleElementClick = (
       if (selectedIds.length < 2) {
          removePartyLink(thisAssignments);
       }
-      setAssigned(id, []);
-      setSelected(id, false);
+
+      //update assigned, goldberg, and selected
+      setState((prev) => {
+         const newState = {
+            ...prev,
+            [id]: {
+               selected: false,
+               goldberg: false,
+               assigned: [],
+               ref: prev[id].ref,
+            },
+         };
+         return newState;
+      });
    }
    document.getElementById("party-name-input")?.focus();
 };

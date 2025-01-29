@@ -8,7 +8,6 @@ import {
    getAssignments,
 } from "../../utils";
 import "./style.css";
-// import { useTextFit } from "./useTextFit";
 
 interface TableProps {
    id: number;
@@ -18,6 +17,7 @@ const Table = forwardRef<HTMLDivElement, TableProps>(({ id }, ref) => {
    const {
       state,
       selectedIds,
+      setState,
       setSelected,
       setAssigned,
       selectGroup,
@@ -26,6 +26,8 @@ const Table = forwardRef<HTMLDivElement, TableProps>(({ id }, ref) => {
       setPartyOveride,
       removePartyLink,
       tableMinStatues,
+      // setGoldberg,
+      // removeGoldberg,
    } = useSelected();
    const tableId = `Table ${id}`;
    const tableState = state[tableId];
@@ -53,7 +55,9 @@ const Table = forwardRef<HTMLDivElement, TableProps>(({ id }, ref) => {
       <div
          ref={ref}
          id={tableId}
-         className={`table ${tableClass} ${confirmedMinClass}`}
+         className={`table ${tableClass} ${confirmedMinClass} ${
+            tableState?.goldberg ? "goldberg" : ""
+         }`}
          onClick={() =>
             handleElementClick(
                getElementSelectState(tableState),
@@ -61,6 +65,7 @@ const Table = forwardRef<HTMLDivElement, TableProps>(({ id }, ref) => {
                selectedIds,
                getAssignments(tableId, state),
                getOtherSelectedAssignments(state),
+               setState,
                setSelected,
                selectGroup,
                deselectAll,
@@ -68,6 +73,8 @@ const Table = forwardRef<HTMLDivElement, TableProps>(({ id }, ref) => {
                setParties,
                setPartyOveride,
                removePartyLink
+               // setGoldberg,
+               // removeGoldberg
             )
          }
       >
