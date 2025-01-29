@@ -172,7 +172,16 @@ const TableMins: React.FC<TableMinsProps> = ({
 
    return (
       <>
-         <div className={`section ${className}`}>
+         <div
+            className={`section ${className}`}
+            style={
+               hasMin
+                  ? {
+                       marginBottom: "16px",
+                    }
+                  : {}
+            }
+         >
             <div className="absolute">
                <div className="header horz">
                   {header}

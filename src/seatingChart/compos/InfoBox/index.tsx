@@ -13,6 +13,7 @@ import BackButton from "../../../shared/BackButton";
 import PrintChart from "./PrintChart";
 // import ToggleSwitch from "../../../shared/ToggleSwitch";
 import TableMins, { updateFirestoreTableMins } from "./TableMins";
+import Goldberg from "./Goldberg";
 
 const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    storedCredential,
@@ -411,6 +412,9 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                         <TableMins parties={[]} />
                      </div>
                   )}
+
+                  {/* Goldberg toggle */}
+                  {parties.length > 0 ? <Goldberg /> : <></>}
 
                   {/* deselect */}
                   {selectedCount > 0 ? (
