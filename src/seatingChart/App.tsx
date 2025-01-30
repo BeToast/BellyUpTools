@@ -13,7 +13,8 @@ import OverlayPrinter from "./compos/OverlayPrinter";
 import Seats from "./compos/Selectables/Seats";
 import Tables from "./compos/Selectables/Tables";
 import { SelectedProvider } from "./context/SelectedContext";
-import StateToFirestore from "./context/StateToFirestore";
+import AssignedToFirestore from "./context/AssignedToFirestore";
+import GoldbergToFirestore from "./context/GoldbergToFirestore";
 import { seatingChartCollection } from "../shared/firebase";
 import { getChartIdFromUrl } from "./utils/chartUrl";
 import PartyLinksToFirestore from "./context/PartyLinksToFirestore";
@@ -103,7 +104,8 @@ function App() {
                      <InfoContext />
                   </div>
 
-                  <StateToFirestore />
+                  <AssignedToFirestore />
+                  <GoldbergToFirestore />
                   <PartyLinksToFirestore />
                </SelectedProvider>
             )

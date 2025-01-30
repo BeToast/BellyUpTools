@@ -42,11 +42,21 @@
    background-color: #b4f3bd;
    border: 2px solid #108722;
 }
-/* .table.selected.CONFIRMED {
-   background-color: #fc7373;
-   border: 2px solid #fc7373;
+.table.selected.CONFIRMED {
+   background-color: #b4f3bd;
+   border: 2px solid #b4f3bd;
    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-} */
+}
+
+.table.goldberg {
+   background-color: #ffdf2c;
+   border: 2px solid #c9ab00;
+}
+.table.selected.goldberg {
+   background-color: #ffdf2c;
+   border: 2px solid #ffdf2c;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
 
 .table-id {
    color: black;
@@ -73,7 +83,8 @@
       box-shadow: none;
    }
    .table.CONFIRMED,
-   .table.INCOMPLETE {
+   .table.INCOMPLETE,
+   .table.goldberg {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
    }

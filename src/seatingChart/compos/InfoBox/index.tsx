@@ -13,6 +13,7 @@ import BackButton from "../../../shared/BackButton";
 import PrintChart from "./PrintChart";
 // import ToggleSwitch from "../../../shared/ToggleSwitch";
 import TableMins, { updateFirestoreTableMins } from "./TableMins";
+import Goldberg from "./Goldberg";
 
 const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    storedCredential,
@@ -21,6 +22,7 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       state,
       unlinkedPartiesArray,
       parties,
+      setState,
       setParties,
       partyOveride,
       setPartyOveride,
@@ -73,10 +75,30 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    useEffect(() => {
       //party ovverride boolean to populate parties when going from none selected
       if (partyOveride) {
-         // selectedIds.forEach((id) => {
-         //    setAssigned(id, parties);
-         // });
-         setAssigned(selectedIds, parties);
+         // set new assigned and goldberg
+         setState((prev) => {
+            const updates: { [key: string]: any } = {};
+
+            selectedIds.forEach((id) => {
+               updates[id] = {
+                  ...prev[id],
+                  assigned: parties,
+                  goldberg: parties.length < 1 ? false : prev[id].goldberg,
+               };
+            });
+
+            return { ...prev, ...updates };
+         });
+
+         // return {
+         //    ...prev,
+         //    [id]: {
+         //       selected: false,
+         //       goldberg: prev[id].goldberg,
+         //       assigned: selectedAssignments,
+         //       ref: prev[id].ref,
+         //    },
+         // };
       } else {
          if (selectedCount > 0) {
             setParties(state[selectedIds[0]].assigned);
@@ -197,6 +219,7 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
    };
 
    const removePartyHandler = (party: string) => {
+      console.log("this is rmeove handler");
       const newParties = parties.filter((p) => p !== party);
       const oldPartyKey = parties.join(",");
       const newPartyKey = newParties.join(",");
@@ -220,10 +243,10 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
          ).then(() => setManualTableMinToRender(undefined));
       }
 
+      // this handles updating partylinks if nessicary
       const partyLinkIndex = partyLinks.findIndex((link) =>
          link.some((assigned) => arraysEqual(parties, assigned))
       );
-
       var otherParty: Array<string> | undefined = undefined;
       if (partyLinkIndex !== -1) {
          otherParty = removePartyLink(parties, partyLinkIndex);
@@ -231,6 +254,8 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
             addPartyLink(newParties, otherParty);
          }
       }
+
+      // update the parties
 
       setParties(newParties);
    };
@@ -410,6 +435,16 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
                      <div style={{ display: "none" }}>
                         <TableMins parties={[]} />
                      </div>
+                  )}
+
+                  {/* Goldberg toggle */}
+                  {parties.length > 0 ? (
+                     <Goldberg
+                        aSelectedTable={selectedIds[0]}
+                        parties={parties}
+                     />
+                  ) : (
+                     <></>
                   )}
 
                   {/* deselect */}

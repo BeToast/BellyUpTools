@@ -22,6 +22,7 @@ import {
 import { TableMinsState } from "../compos/InfoBox/TableMins";
 export interface RecordValue {
    selected: boolean;
+   goldberg: boolean;
    assigned: Array<string>;
    ref: React.RefObject<HTMLDivElement>;
 }
@@ -42,10 +43,10 @@ interface SelectedContextType {
    setParties: (parties: Array<string>) => void;
    partyOveride: boolean;
    setPartyOveride: (partyOveride: boolean) => void;
-   // setVacant: (id: string) => void;
    setSelected: (id: string, selected: boolean) => void;
    selectGroup: (id: string) => void;
    deselectAll: () => void;
+   setGoldberg: (id: string, goldberg: boolean) => void;
    setAssigned: (
       ids: string | string[],
       assigned: Array<string>,
@@ -59,13 +60,18 @@ interface SelectedContextType {
       index?: number
    ) => Array<string> | undefined;
    assignedState: Record<string, Array<string>>;
+   goldbergState: Record<string, boolean>;
    prevAssignedStateHash: string;
    docRef: DocumentReference;
    docInputs: InputsState | undefined;
    setDocInputs: React.Dispatch<React.SetStateAction<InputsState | undefined>>;
-   docState: [string, string[]][] | undefined;
-   setDocState: React.Dispatch<
+   docAssigned: [string, string[]][] | undefined;
+   setDocAssigned: React.Dispatch<
       React.SetStateAction<[string, string[]][] | undefined>
+   >;
+   docGoldberg: [string, boolean][] | undefined;
+   setDocGoldberg: React.Dispatch<
+      React.SetStateAction<[string, boolean][] | undefined>
    >;
    firestoreLoaded: boolean;
    writing: boolean;
@@ -98,15 +104,19 @@ const SelectedContext = createContext<SelectedContextType>({
    setSelected: () => {},
    selectGroup: () => {},
    deselectAll: () => {},
+   setGoldberg: () => {},
    setAssigned: () => {},
    removeAssigned: () => {},
    addPartyLink: () => {},
    removePartyLink: () => undefined,
    assignedState: {},
+   goldbergState: {},
    prevAssignedStateHash: "",
    docRef: {} as DocumentReference,
-   docState: undefined,
-   setDocState: () => {},
+   docAssigned: undefined,
+   setDocAssigned: () => {},
+   docGoldberg: undefined,
+   setDocGoldberg: () => {},
    docInputs: undefined,
    setDocInputs: () => {},
    firestoreLoaded: false,
@@ -125,10 +135,12 @@ export const SelectedProvider: React.FC<{
    const [docInputs, setDocInputs] = useState<InputsState | undefined>(
       undefined
    );
-   const [docState, setDocState] = useState<[string, string[]][] | undefined>(
-      undefined
-   );
-
+   const [docAssigned, setDocAssigned] = useState<
+      [string, string[]][] | undefined
+   >(undefined);
+   const [docGoldberg, setDocGoldberg] = useState<
+      [string, boolean][] | undefined
+   >(undefined);
    const [docTableMins, setDocTableMins] = useState<TableMinsState | undefined>(
       undefined
    );
@@ -140,6 +152,7 @@ export const SelectedProvider: React.FC<{
       state: 0,
       partyLinks: 0,
       tableMins: 0,
+      goldberg: 0,
    });
 
    useEffect(() => {
@@ -161,7 +174,7 @@ export const SelectedProvider: React.FC<{
                   ) as [string, string[]][];
                   const newHash = hash(newState);
                   if (newHash !== prevHashRef.current.state) {
-                     setDocState(newState);
+                     setDocAssigned(newState);
                      prevHashRef.current.state = newHash;
                   }
                   setExtraChairs(newState.length - 42);
@@ -186,6 +199,15 @@ export const SelectedProvider: React.FC<{
                      prevHashRef.current.tableMins = newHash;
                   }
                }
+
+               if (data.goldberg) {
+                  const newHash = hash(data.goldberg);
+                  if (newHash !== prevHashRef.current.goldberg) {
+                     // console.log(data.goldberg);
+                     setDocGoldberg(Object.entries(data.goldberg));
+                     prevHashRef.current.goldberg = newHash;
+                  }
+               }
             }
          }
       });
@@ -194,14 +216,15 @@ export const SelectedProvider: React.FC<{
    }, [docRef]);
 
    useEffect(() => {
-      if (!docState) return;
+      if (!docAssigned) return;
 
-      console.log("Processing updated docState");
+      // console.log("Processing updated docAssigned");
+      // console.log(docAssigned);
 
       setState((prevState) => {
          const newState: Record<string, RecordValue> = { ...prevState };
 
-         docState.forEach(([id, assigned]) => {
+         docAssigned.forEach(([id, assigned]) => {
             newState[id] = {
                ...prevState[id], // Preserve existing properties
                assigned,
@@ -210,11 +233,37 @@ export const SelectedProvider: React.FC<{
             };
          });
 
-         console.log("Updating local state with processed docState");
+         // console.log("Updating local state with processed docAssigned");
          return newState;
       });
       setFirestoreLoaded(true);
-   }, [docState]);
+   }, [docAssigned]);
+
+   useEffect(() => {
+      if (!docGoldberg) return;
+
+      // console.log("Processing updated docGoldberg");
+
+      setState((prevState) => {
+         const newState: Record<string, RecordValue> = { ...prevState };
+         console.log("docGoldberg\n");
+         console.log(docGoldberg);
+
+         docGoldberg.forEach(([id, isGoldberg]) => {
+            newState[id] = {
+               ...prevState[id], // Preserve existing properties
+               assigned: prevState[id]?.assigned ?? [],
+               goldberg: isGoldberg,
+               selected: prevState[id]?.selected ?? false,
+               ref: prevState[id]?.ref ?? React.createRef<HTMLDivElement>(),
+            };
+         });
+
+         // console.log("Updating local state with processed docGoldberg");
+         return newState;
+      });
+      setFirestoreLoaded(true);
+   }, [docGoldberg]);
 
    // const getDocRef = useCallback(() => {
    //    return doc(chartCollection, chartId)
@@ -226,11 +275,6 @@ export const SelectedProvider: React.FC<{
    const [assignedElements, setAssignedElements] = useState<
       Record<string, Array<Element>>
    >({});
-
-   useEffect(() => {
-      setSelectedIds(Object.keys(state).filter((id) => state[id].selected));
-      setAssignedElements(createAssignedElementsRecord(state));
-   }, [state]);
 
    const [extraChairs, setExtraChairs] = useState<number>(0);
    // const [keyToRemove, setKeyToRemove] = useState<string | null>(null);
@@ -249,33 +293,56 @@ export const SelectedProvider: React.FC<{
    //when setPartyOverride is true, then whatever parties are in the InfoBox state will be assigned to the clicked selectable
    const [partyOveride, setPartyOveride] = useState<boolean>(false);
 
+   // assignedState
    const [assignedState, setAssignedState] = useState<
       Record<string, Array<string>>
    >({});
    const [prevAssignedStateHash, setPrevAssignedStateHash] =
       useState<string>("");
+
+   // goldbergState
+   const [goldbergState, setGoldbergState] = useState<Record<string, boolean>>(
+      {}
+   );
+   const [prevGoldbergStateHash, setGoldbergStateHash] = useState<string>("");
+
    const [writing, setWriting] = useState<boolean>(false);
 
-   //this is to set assignedState when nessicary for firebase syncing
    useEffect(() => {
-      // Compute the new assigned state
+      //update local vars
+      const newSelectedIds = Object.keys(state).filter(
+         (id) => state[id].selected
+      );
+      setSelectedIds(newSelectedIds);
+
+      setAssignedElements(createAssignedElementsRecord(state));
+
+      // update assigned and goldberg states
       const newAssignedState: Record<string, Array<string>> = {};
+      const newGoldbergState: Record<string, boolean> = {};
 
       for (const [key, value] of Object.entries(state)) {
          if (value.assigned) {
             newAssignedState[key] = value.assigned;
          }
+         if (value.goldberg !== undefined) {
+            newGoldbergState[key] = value.goldberg;
+         }
       }
-      // console.log("newAssignedState", newAssignedState);
-
       // Hash the new state
-      const newStateHash = hashRecord(newAssignedState);
+      const newAssignedStateHash = hashRecord(newAssignedState);
+      const newGoldbergStateHash = hashRecord(newGoldbergState);
 
       // If the hash is different, update the state
-      if (newStateHash !== prevAssignedStateHash) {
+      if (newAssignedStateHash !== prevAssignedStateHash) {
          setAssignedState(newAssignedState);
-         setPrevAssignedStateHash(newStateHash);
+         setPrevAssignedStateHash(newAssignedStateHash);
       }
+      if (newGoldbergStateHash !== prevGoldbergStateHash) {
+         setGoldbergState(newGoldbergState);
+         setGoldbergStateHash(newGoldbergStateHash);
+      }
+      // console.log(newGoldbergStateHash);
    }, [state]);
 
    const updateUnlinkedPartiesArray = useCallback(() => {
@@ -331,10 +398,33 @@ export const SelectedProvider: React.FC<{
             ...prev,
             [id]: {
                selected: selected,
+               goldberg: prev[id].goldberg,
                assigned: prev[id].assigned,
                ref: prev[id].ref,
             },
          };
+      });
+   }, []);
+
+   const setGoldberg = useCallback((id: string, goldberg: boolean) => {
+      setState((prev) => {
+         const partyKeys: string[] = Object.keys(prev).filter(
+            (currId: string) =>
+               arraysEqual(prev[currId].assigned, prev[id].assigned)
+         );
+
+         return partyKeys.reduce(
+            (newState, key) => {
+               return {
+                  ...newState,
+                  [key]: {
+                     ...prev[key],
+                     goldberg: goldberg,
+                  },
+               };
+            },
+            { ...prev }
+         );
       });
    }, []);
 
@@ -412,6 +502,7 @@ export const SelectedProvider: React.FC<{
             ...prev,
             [id]: {
                selected: prev[id].selected,
+               goldberg: prev[id].goldberg,
                assigned: remainingAssigned,
                ref: prev[id].ref,
             },
@@ -548,15 +639,19 @@ export const SelectedProvider: React.FC<{
       setSelected,
       selectGroup,
       deselectAll,
+      setGoldberg,
       setAssigned,
       removeAssigned,
       addPartyLink,
       removePartyLink,
       assignedState,
+      goldbergState,
       prevAssignedStateHash,
       docRef,
-      docState,
-      setDocState,
+      docAssigned,
+      setDocAssigned,
+      docGoldberg,
+      setDocGoldberg,
       docInputs,
       setDocInputs,
       firestoreLoaded,
