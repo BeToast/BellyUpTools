@@ -71,4 +71,10 @@
       border: 1px dashed black;
       box-shadow: none;
    }
+   .seat.CONFIRMED,
+   .seat.INCOMPLETE,
+   .seat.goldberg {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+   }
 }
