@@ -29,6 +29,7 @@ export const newChartDoc = async (
          state: {
             [key: string]: string[];
          };
+         goldberg: Record<string, boolean>;
       } = {
          inputs: {
             show: show,
@@ -40,6 +41,7 @@ export const newChartDoc = async (
             notes: "",
          },
          state,
+         goldberg: { "Table 16": true },
       };
 
       // Add a new document with a generated ID
