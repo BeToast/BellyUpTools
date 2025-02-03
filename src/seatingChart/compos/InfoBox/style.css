@@ -177,6 +177,12 @@
    border: 2px solid rgb(99, 172, 224);
 }
 
+.deselect-button.writing {
+   background-color: #f7e864;
+   pointer-events: none;
+   cursor: wait;
+}
+
 .info-box > .section {
    position: relative;
 }

@@ -29,7 +29,9 @@ export const arraysSameContents = (a: string[], b: string[]) => {
    return true;
 };
 
-export const hashRecord = (record: Record<string, Array<string>>): string => {
+export const hashRecord = (
+   record: Record<string, Array<string> | boolean>
+): string => {
    return stringify(record);
 };
 

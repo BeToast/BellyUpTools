@@ -20,6 +20,7 @@ const Seat = forwardRef<HTMLDivElement, SeatProps>(
       const {
          state,
          selectedIds,
+         setState,
          setSelected,
          selectGroup,
          setAssigned,
@@ -27,6 +28,8 @@ const Seat = forwardRef<HTMLDivElement, SeatProps>(
          setParties,
          setPartyOveride,
          removePartyLink,
+         // setGoldberg,
+         // removeGoldberg,
       } = useSelected();
       const seatId = `Seat ${id}`;
       const seatState = state[seatId];
@@ -38,7 +41,9 @@ const Seat = forwardRef<HTMLDivElement, SeatProps>(
             <div
                ref={ref}
                id={seatId}
-               className={`seat ${seatClass} ${invis ? "invis" : ""}`}
+               className={`seat ${seatClass} ${invis ? "invis" : ""} ${
+                  seatState?.goldberg ? "goldberg" : ""
+               }`}
                onClick={() =>
                   handleElementClick(
                      getElementSelectState(seatState),
@@ -46,6 +51,7 @@ const Seat = forwardRef<HTMLDivElement, SeatProps>(
                      selectedIds,
                      getAssignments(seatId, state),
                      getOtherSelectedAssignments(state),
+                     setState,
                      setSelected,
                      selectGroup,
                      deselectAll,
@@ -53,6 +59,8 @@ const Seat = forwardRef<HTMLDivElement, SeatProps>(
                      setParties,
                      setPartyOveride,
                      removePartyLink
+                     // setGoldberg,
+                     // removeGoldberg
                   )
                }
             >

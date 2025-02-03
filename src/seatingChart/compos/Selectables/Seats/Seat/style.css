@@ -35,6 +35,14 @@
    border: 1px solid black;
    z-index: 10;
 }
+.seat.goldberg {
+   background-color: #ffdf2c;
+   border: 1px solid #c9ab00;
+}
+.seat.selected.goldberg {
+   background-color: #ffdf2c;
+   border: 1px solid black;
+}
 
 .seat-id {
    color: black;
@@ -62,5 +70,11 @@
    .seat.vacant:hover {
       border: 1px dashed black;
       box-shadow: none;
+   }
+   .seat.CONFIRMED,
+   .seat.INCOMPLETE,
+   .seat.goldberg {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
    }
 }
