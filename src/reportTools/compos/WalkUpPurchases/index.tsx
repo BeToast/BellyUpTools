@@ -45,7 +45,7 @@ const WalkUpPurchases: React.FC<{
    console.log(totalCash);
 
    return (
-      <div className="card">
+      <div className="card sub">
          <h2>Walk-Up Purchase Analysis</h2>
          <div>
             <h3>Cash Transactions</h3>

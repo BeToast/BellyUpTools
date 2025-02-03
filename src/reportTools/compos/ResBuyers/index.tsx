@@ -101,7 +101,7 @@ const ResBuyers: React.FC<{
 
    return (
       <>
-         <div className="card">
+         <div className="card sub">
             <h2>Reserved Buyers Report</h2>
             {data !== null &&
                (data.length > 0 ? (

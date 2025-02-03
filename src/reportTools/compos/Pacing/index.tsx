@@ -17,7 +17,7 @@ const Pacing: React.FC<{ json: any[]; eventName: string; eventDate: Date }> = ({
    return (
       <>
          {salesPacingText && (
-            <div className="card">
+            <div className="card sub">
                <h2>Sales Pacing</h2>
                <pre>{salesPacingText}</pre>
             </div>

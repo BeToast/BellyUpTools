@@ -3,27 +3,34 @@ export const calculateSalesPacing = (
    eventName: string,
    eventDate: Date
 ): string => {
+   const matchTicketType = (row: any, type: string): boolean => {
+      const ticketType = (row["Ticket Type"] || "").toString().toLowerCase();
+      return ticketType.includes(type.toLowerCase());
+   };
+
    const totalGa = json
-      .filter((row) => row["Ticket Type"] === "General Admission")
+      .filter((row) => matchTicketType(row, "general"))
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
    const totalRes = json
-      .filter((row) => row["Ticket Type"] === "Reserved")
+      .filter((row) => matchTicketType(row, "reserved"))
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
    const totalVip = json
-      .filter((row) => row["Ticket Type"]?.includes("VIP"))
+      .filter((row) => matchTicketType(row, "vip"))
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
          0
       );
    const total = totalGa + totalRes + totalVip;
 
-   const hadPresale: boolean = json.some((row) => row.Source === "Presale");
+   const hadPresale: boolean = json.some(
+      (row) => (row.Source || "").toString().toLowerCase() === "presale"
+   );
    var presaleGa: number = 0;
    var presaleRes: number = 0;
    var presaleVip: number = 0;
@@ -36,8 +43,8 @@ export const calculateSalesPacing = (
       presaleGa = json
          .filter(
             (row) =>
-               row.Source === "Presale" &&
-               row["Ticket Type"] === "General Admission"
+               (row.Source || "").toString().toLowerCase() === "presale" &&
+               matchTicketType(row, "general")
          )
          .reduce(
             (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -46,7 +53,8 @@ export const calculateSalesPacing = (
       presaleRes = json
          .filter(
             (row) =>
-               row.Source === "Presale" && row["Ticket Type"] === "Reserved"
+               (row.Source || "").toString().toLowerCase() === "presale" &&
+               matchTicketType(row, "reserved")
          )
          .reduce(
             (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -55,7 +63,8 @@ export const calculateSalesPacing = (
       presaleVip = json
          .filter(
             (row) =>
-               row.Source === "Presale" && row?.["Ticket Type"]?.includes("VIP")
+               (row.Source || "").toString().toLowerCase() === "presale" &&
+               matchTicketType(row, "vip")
          )
          .reduce(
             (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -64,7 +73,9 @@ export const calculateSalesPacing = (
       presale = presaleGa + presaleRes + presaleVip;
 
       earliestPresaleDate = json
-         .filter((row) => row.Source === "Presale")
+         .filter(
+            (row) => (row.Source || "").toString().toLowerCase() === "presale"
+         )
          .reduce((earliest, current) => {
             const currentDate = excelSerialDateToJSDate(current.Completed);
             return earliest === null || currentDate < earliest
@@ -75,7 +86,9 @@ export const calculateSalesPacing = (
       firstDayPublicDate = new Date(earliestPresaleDate.getTime() + 86400000);
    } else {
       firstDayPublicDate = json
-         .filter((row) => row.Source === "_Public")
+         .filter(
+            (row) => (row.Source || "").toString().toLowerCase() === "_public"
+         )
          .reduce((earliest, current) => {
             const currentDate = excelSerialDateToJSDate(current.Completed);
             return earliest === null || currentDate < earliest
@@ -91,8 +104,8 @@ export const calculateSalesPacing = (
                excelSerialDateToJSDate(row.Completed),
                firstDayPublicDate
             ) &&
-            row.Source === "_Public" &&
-            row["Ticket Type"] === "General Admission"
+            (row.Source || "").toString().toLowerCase() === "_public" &&
+            matchTicketType(row, "general")
          );
       })
       .reduce(
@@ -107,8 +120,8 @@ export const calculateSalesPacing = (
                excelSerialDateToJSDate(row.Completed),
                firstDayPublicDate
             ) &&
-            row.Source === "_Public" &&
-            row["Ticket Type"] === "Reserved"
+            (row.Source || "").toString().toLowerCase() === "_public" &&
+            matchTicketType(row, "reserved")
          );
       })
       .reduce(
@@ -123,8 +136,8 @@ export const calculateSalesPacing = (
                excelSerialDateToJSDate(row.Completed),
                firstDayPublicDate
             ) &&
-            row.Source === "_Public" &&
-            row?.["Ticket Type"]?.includes("VIP")
+            (row.Source || "").toString().toLowerCase() === "_public" &&
+            matchTicketType(row, "vip")
          );
       })
       .reduce(
@@ -141,7 +154,7 @@ export const calculateSalesPacing = (
             areEqualByComponents(
                excelSerialDateToJSDate(row.Completed),
                eventDate
-            ) && row["Ticket Type"] === "General Admission"
+            ) && matchTicketType(row, "general")
          );
       })
       .reduce(
@@ -155,7 +168,7 @@ export const calculateSalesPacing = (
             areEqualByComponents(
                excelSerialDateToJSDate(row.Completed),
                eventDate
-            ) && row["Ticket Type"] === "Reserved"
+            ) && matchTicketType(row, "reserved")
          );
       })
       .reduce(
@@ -169,7 +182,7 @@ export const calculateSalesPacing = (
             areEqualByComponents(
                excelSerialDateToJSDate(row.Completed),
                eventDate
-            ) && row?.["Ticket Type"]?.includes("VIP")
+            ) && matchTicketType(row, "vip")
          );
       })
       .reduce(
@@ -182,8 +195,8 @@ export const calculateSalesPacing = (
    const privateGa = json
       .filter(
          (row) =>
-            row.Source === "Private_Purchase" &&
-            row["Ticket Type"] === "General Admission"
+            (row.Source || "").toString().toLowerCase() ===
+               "private_purchase" && matchTicketType(row, "general")
       )
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -192,8 +205,8 @@ export const calculateSalesPacing = (
    const privateRes = json
       .filter(
          (row) =>
-            row.Source === "Private_Purchase" &&
-            row["Ticket Type"] === "Reserved"
+            (row.Source || "").toString().toLowerCase() ===
+               "private_purchase" && matchTicketType(row, "reserved")
       )
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -202,8 +215,8 @@ export const calculateSalesPacing = (
    const privateVip = json
       .filter(
          (row) =>
-            row.Source === "Private_Purchase" &&
-            row?.["Ticket Type"]?.includes("VIP")
+            (row.Source || "").toString().toLowerCase() ===
+               "private_purchase" && matchTicketType(row, "vip")
       )
       .reduce(
          (sum, row) => sum + (parseInt(row.QTY?.toString() ?? "0", 10) || 0),
@@ -228,17 +241,17 @@ export const calculateSalesPacing = (
    for (const row of sortedData) {
       const qty = parseInt(row.QTY?.toString() ?? "0", 10) || 0;
 
-      if (row["Ticket Type"] === "General Admission") {
+      if (matchTicketType(row, "general")) {
          runningGaTotal += qty;
          if (runningGaTotal >= 370 && !gaSoldOutDate) {
             gaSoldOutDate = excelSerialDateToJSDate(row.Completed);
          }
-      } else if (row["Ticket Type"] === "Reserved") {
+      } else if (matchTicketType(row, "reserved")) {
          runningResTotal += qty;
          if (runningResTotal >= 80 && !resSoldOutDate) {
             resSoldOutDate = excelSerialDateToJSDate(row.Completed);
          }
-      } else if (row?.["Ticket Type"]?.includes("VIP")) {
+      } else if (matchTicketType(row, "vip")) {
          runningVipTotal += qty;
          if (runningVipTotal >= 50 && !vipSoldOutDate) {
             vipSoldOutDate = excelSerialDateToJSDate(row.Completed);
@@ -247,11 +260,7 @@ export const calculateSalesPacing = (
    }
 
    const getPriceAndFees = (type: string) => {
-      const ticket = json.find((row) =>
-         type === "VIP"
-            ? row["Ticket Type"]?.includes(type)
-            : row["Ticket Type"] === type
-      );
+      const ticket = json.find((row) => matchTicketType(row, type));
       if (!ticket) return null;
       const qty = parseInt(ticket.QTY?.toString() ?? "1", 10) || 1;
       return {
@@ -260,9 +269,9 @@ export const calculateSalesPacing = (
       };
    };
 
-   const gaPrice = getPriceAndFees("General Admission");
-   const resPrice = getPriceAndFees("Reserved");
-   const vipPrice = getPriceAndFees("VIP");
+   const gaPrice = getPriceAndFees("general");
+   const resPrice = getPriceAndFees("reserved");
+   const vipPrice = getPriceAndFees("vip");
 
    const formatTicketCount = (
       total: number,
@@ -317,7 +326,9 @@ export const calculateSalesPacing = (
    return `${eventName} - ${eventDate.toDateString()}
       Prices: ga($${gaPrice?.price}, $${gaPrice?.fees}) res($${
       resPrice?.price
-   }, $${resPrice?.fees}) vip($${vipPrice?.price}, $${vipPrice?.fees})
+   }, $${resPrice?.fees}) ${
+      vipPrice ? `vip($${vipPrice?.price}, $${vipPrice?.fees})` : ""
+   }
       Total - ${formatTicketCount(total, totalGa, totalRes, totalVip)}
       ${
          hadPresale
