@@ -3,7 +3,7 @@ import { useState } from "react";
 const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
    const [openerStart, setOpenerStart] = useState<string>("20:00");
    const [headlinerStart, setHeadlinerStart] = useState<string>("21:00");
-   const [totalSold, setTotalSold] = useState<number>(450);
+   // const [totalSold, setTotalSold] = useState<number>(450);
 
    if (!json || json.length === 0) {
       return null;
@@ -70,7 +70,7 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
       matchTicketType(row, "reserved")
    ).length;
    const totalVip = json.filter((row) => matchTicketType(row, "vip")).length;
-   const totalScanned = totalGa + totalRes + totalVip;
+   // const totalScanned = totalGa + totalRes + totalVip;
 
    // Count at opener
    const openerGa = countTypeBeforeTime(json, openerStart, "general");
@@ -83,8 +83,8 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
    const headlinerVip = countTypeBeforeTime(json, headlinerStart, "vip");
 
    // Calculate no-shows
-   const noShows = totalSold - totalScanned;
-   const noShowPercentage = ((noShows / totalSold) * 100).toFixed(1);
+   // const noShows = totalSold - totalScanned;
+   // const noShowPercentage = ((noShows / totalSold) * 100).toFixed(1);
 
    return (
       <div className="card">
@@ -112,7 +112,7 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
                   className="p-2 border rounded"
                />
             </div>
-            <div>
+            {/* <div>
                <label className="block text-sm font-medium mb-1">
                   Total Sold:
                </label>
@@ -122,7 +122,7 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
                   onChange={(e) => setTotalSold(Number(e.target.value))}
                   className="p-2 border rounded w-24"
                />
-            </div>
+            </div> */}
          </div>
          <pre style={{ whiteSpace: "pre-line" }}>
             {openerStart &&
@@ -134,7 +134,7 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
                   headlinerVip
                )}\n`}
             TOTAL SCANNED: {formatSection(totalGa, totalRes, totalVip)}
-            {`\nNO SHOWS: ${noShows} (${noShowPercentage}%)`}
+            {/* {`\nNO SHOWS: ${noShows} (${noShowPercentage}%)`} */}
          </pre>
       </div>
    );
