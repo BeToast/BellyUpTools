@@ -26,7 +26,6 @@ const InfoBox: React.FC<{ storedCredential: UserCredential }> = ({
       setParties,
       partyOveride,
       setPartyOveride,
-      setAssigned,
       setSelected,
       partyLinks,
       addPartyLink,
