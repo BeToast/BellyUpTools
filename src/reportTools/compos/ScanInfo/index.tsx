@@ -16,14 +16,8 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
 
    const excelSerialToMinutes = (serial: number): number | null => {
       try {
-         // Convert Excel serial to milliseconds
-         const utc_days = Math.floor(serial - 25569);
-         const utc_value = utc_days * 86400;
-         const date_info = new Date(utc_value * 1000);
-
-         // Get the decimal part (time portion)
          const time_part = serial % 1;
-         const total_minutes = Math.round(time_part * 24 * 60);
+         const total_minutes = Math.round(time_part * 24 * 60) - 60;
 
          return total_minutes;
       } catch (error) {
