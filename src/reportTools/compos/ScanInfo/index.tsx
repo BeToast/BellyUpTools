@@ -1,45 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
    scanReportFileName,
    json,
 }) => {
-   const [supportStart, mainStart] = convertToMilitaryTime(scanReportFileName);
+   const [openerStart, setOpenerStart] = useState<string>("20:00");
+   const [headlinerStart, setHeadlinerStart] = useState<string>("21:00");
 
-   const [openerStart, setOpenerStart] = useState<string>(supportStart);
-   const [headlinerStart, setHeadlinerStart] = useState<string>(mainStart);
+   useEffect(() => {
+      const [supportStart, mainStart] =
+         convertToMilitaryTime(scanReportFileName);
+      setOpenerStart(supportStart);
+      setHeadlinerStart(mainStart);
+   }, [scanReportFileName]); // Dependency array includes scanReportFileName
 
    if (!json || json.length === 0) {
       return null;
-   }
-
-   function convertToMilitaryTime(filename: string): [string, string] {
-      // Extract the time portion using regex
-      const timeMatch = filename.match(/(\d+)_(\d+)PM\.xls$/);
-
-      if (!timeMatch) {
-         return ["20:00", "21:00"];
-      }
-
-      let hours = parseInt(timeMatch[1]);
-      const minutes = timeMatch[2];
-
-      // Convert to 24-hour format
-      if (hours !== 12) {
-         hours += 12;
-      }
-
-      // Format with leading zeros
-      const formattedHours = hours.toString().padStart(2, "0");
-      const originalTime = `${formattedHours}:${minutes}`;
-
-      // Calculate time + 1 hour
-      const nextHour = (hours + 1) % 24;
-      const incrementedTime = `${nextHour
-         .toString()
-         .padStart(2, "0")}:${minutes}`;
-
-      return [originalTime, incrementedTime];
    }
 
    const matchTicketType = (row: any, type: string): boolean => {
@@ -158,3 +134,30 @@ const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
 };
 
 export default ScanInfo;
+
+function convertToMilitaryTime(filename: string): [string, string] {
+   // Extract the time portion using regex
+   const timeMatch = filename.match(/.*?(\d+)_(\d+)PM\.xls$/);
+
+   if (!timeMatch) {
+      return ["20:00", "21:00"];
+   }
+
+   let hours = parseInt(timeMatch[1]);
+   const minutes = timeMatch[2];
+
+   // Convert to 24-hour format
+   if (hours !== 12) {
+      hours += 12;
+   }
+
+   // Format with leading zeros
+   const formattedHours = hours.toString().padStart(2, "0");
+   const originalTime = `${formattedHours}:${minutes}`;
+
+   // Calculate time + 1 hour
+   const nextHour = (hours + 1) % 24;
+   const incrementedTime = `${nextHour.toString().padStart(2, "0")}:${minutes}`;
+
+   return [originalTime, incrementedTime];
+}
