@@ -1,12 +1,45 @@
 import { useState } from "react";
 
-const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
-   const [openerStart, setOpenerStart] = useState<string>("20:00");
-   const [headlinerStart, setHeadlinerStart] = useState<string>("21:00");
-   // const [totalSold, setTotalSold] = useState<number>(450);
+const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
+   scanReportFileName,
+   json,
+}) => {
+   const [supportStart, mainStart] = convertToMilitaryTime(scanReportFileName);
+
+   const [openerStart, setOpenerStart] = useState<string>(supportStart);
+   const [headlinerStart, setHeadlinerStart] = useState<string>(mainStart);
 
    if (!json || json.length === 0) {
       return null;
+   }
+
+   function convertToMilitaryTime(filename: string): [string, string] {
+      // Extract the time portion using regex
+      const timeMatch = filename.match(/(\d+)_(\d+)PM\.xls$/);
+
+      if (!timeMatch) {
+         return ["20:00", "21:00"];
+      }
+
+      let hours = parseInt(timeMatch[1]);
+      const minutes = timeMatch[2];
+
+      // Convert to 24-hour format
+      if (hours !== 12) {
+         hours += 12;
+      }
+
+      // Format with leading zeros
+      const formattedHours = hours.toString().padStart(2, "0");
+      const originalTime = `${formattedHours}:${minutes}`;
+
+      // Calculate time + 1 hour
+      const nextHour = (hours + 1) % 24;
+      const incrementedTime = `${nextHour
+         .toString()
+         .padStart(2, "0")}:${minutes}`;
+
+      return [originalTime, incrementedTime];
    }
 
    const matchTicketType = (row: any, type: string): boolean => {
@@ -82,10 +115,6 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
    const headlinerRes = countTypeBeforeTime(json, headlinerStart, "reserved");
    const headlinerVip = countTypeBeforeTime(json, headlinerStart, "vip");
 
-   // Calculate no-shows
-   // const noShows = totalSold - totalScanned;
-   // const noShowPercentage = ((noShows / totalSold) * 100).toFixed(1);
-
    return (
       <div className="card">
          <h2>TIX SCANNED</h2>
@@ -112,29 +141,17 @@ const ScanInfo: React.FC<{ json: any[] }> = ({ json }) => {
                   className="p-2 border rounded"
                />
             </div>
-            {/* <div>
-               <label className="block text-sm font-medium mb-1">
-                  Total Sold:
-               </label>
-               <input
-                  type="number"
-                  value={totalSold}
-                  onChange={(e) => setTotalSold(Number(e.target.value))}
-                  className="p-2 border rounded w-24"
-               />
-            </div> */}
          </div>
          <pre style={{ whiteSpace: "pre-line" }}>
             {openerStart &&
-               `AT OPENER: ${formatSection(openerGa, openerRes, openerVip)}\n`}
+               `AT SUPPORT: ${formatSection(openerGa, openerRes, openerVip)}\n`}
             {headlinerStart &&
-               `AT HEADLINER: ${formatSection(
+               `AT MAIN: ${formatSection(
                   headlinerGa,
                   headlinerRes,
                   headlinerVip
                )}\n`}
             TOTAL SCANNED: {formatSection(totalGa, totalRes, totalVip)}
-            {/* {`\nNO SHOWS: ${noShows} (${noShowPercentage}%)`} */}
          </pre>
       </div>
    );

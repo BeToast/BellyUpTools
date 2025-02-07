@@ -267,7 +267,10 @@ const App: React.FC = () => {
                   fileName={scanReportFileName}
                />
 
-               <ScanInfo json={scanReportJson} />
+               <ScanInfo
+                  scanReportFileName={scanReportFileName}
+                  json={scanReportJson}
+               />
             </div>
          </div>
       </>
