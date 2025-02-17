@@ -7,14 +7,18 @@ const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
    const [openerStart, setOpenerStart] = useState<string>("20:00");
    const [headlinerStart, setHeadlinerStart] = useState<string>("21:00");
 
+   // Filter for scanned tickets only
+   const scannedData = json.filter(row => row["Scanned"] == "1");
+   const unscannedData = json.filter(row => row["Scanned"] == "0");
+
    useEffect(() => {
       const [supportStart, mainStart] =
          convertToMilitaryTime(scanReportFileName);
       setOpenerStart(supportStart);
       setHeadlinerStart(mainStart);
-   }, [scanReportFileName]); // Dependency array includes scanReportFileName
+   }, [scanReportFileName]);
 
-   if (!json || json.length === 0) {
+   if (!scannedData || scannedData.length === 0) {
       return null;
    }
 
@@ -67,32 +71,50 @@ const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
 
    const formatSection = (ga: number, res: number, vip: number) => {
       const parts = [];
-      parts.push(`ga(${ga})`);
-      if (res > 0) parts.push(`res(${res})`);
-      if (vip > 0) parts.push(`vip(${vip})`);
+      const gaPercent = totalSoldGa > 0 ? Math.round((ga / totalSoldGa) * 100) : 0;
+      const resPercent = totalSoldRes > 0 ? Math.round((res / totalSoldRes) * 100) : 0;
+      const vipPercent = totalSoldVip > 0 ? Math.round((vip / totalSoldVip) * 100) : 0;
+
+      parts.push(`ga(${ga}, ${gaPercent}%)`);
+      if (res > 0) parts.push(`res(${res}, ${resPercent}%)`);
+      if (vip > 0) parts.push(`vip(${vip}, ${vipPercent}%)`);
       return parts.join(" ");
    };
 
-   // Count totals
-   const totalGa = json.filter((row) => matchTicketType(row, "general")).length;
-   const totalRes = json.filter((row) =>
+   // Count totals using scannedData
+   const totalGa = scannedData.filter((row) => matchTicketType(row, "general")).length;
+   const totalRes = scannedData.filter((row) =>
       matchTicketType(row, "reserved")
    ).length;
-   const totalVip = json.filter((row) => matchTicketType(row, "vip")).length;
-   // const totalScanned = totalGa + totalRes + totalVip;
+   const totalVip = scannedData.filter((row) => matchTicketType(row, "vip")).length;
 
-   // Count at opener
-   const openerGa = countTypeBeforeTime(json, openerStart, "general");
-   const openerRes = countTypeBeforeTime(json, openerStart, "reserved");
-   const openerVip = countTypeBeforeTime(json, openerStart, "vip");
+   // Count at opener using scannedData
+   const openerGa = countTypeBeforeTime(scannedData, openerStart, "general");
+   const openerRes = countTypeBeforeTime(scannedData, openerStart, "reserved");
+   const openerVip = countTypeBeforeTime(scannedData, openerStart, "vip");
 
-   // Count at headliner
-   const headlinerGa = countTypeBeforeTime(json, headlinerStart, "general");
-   const headlinerRes = countTypeBeforeTime(json, headlinerStart, "reserved");
-   const headlinerVip = countTypeBeforeTime(json, headlinerStart, "vip");
+   // Count at headliner using scannedData
+   const headlinerGa = countTypeBeforeTime(scannedData, headlinerStart, "general");
+   const headlinerRes = countTypeBeforeTime(scannedData, headlinerStart, "reserved");
+   const headlinerVip = countTypeBeforeTime(scannedData, headlinerStart, "vip");
+
+   // no show
+   const noShowGa = unscannedData.filter((row) => matchTicketType(row, "general")).length;
+   const noShowRes = unscannedData.filter((row) =>
+      matchTicketType(row, "reserved")
+   ).length;
+   const noShowVip = unscannedData.filter((row) => matchTicketType(row, "vip")).length;
+
+   // total sold
+   const totalSoldGa = totalGa + noShowGa;
+   const totalSoldRes = totalRes + noShowRes;
+   const totalSoldVip = totalVip + noShowVip;
+
+
+   console.log(`${noShowGa}\n${noShowRes}\n${noShowVip}`);
 
    return (
-      <div className="card">
+      <div className="card sub">
          <h2>TIX SCANNED</h2>
          <div className="mb-4 flex gap-4">
             <div>
@@ -118,16 +140,17 @@ const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
                />
             </div>
          </div>
-         <pre style={{ whiteSpace: "pre-line" }}>
+         <pre style={{ whiteSpace: "pre" }}>
             {openerStart &&
-               `AT SUPPORT: ${formatSection(openerGa, openerRes, openerVip)}\n`}
+               `        AT SUPPORT: ${formatSection(openerGa, openerRes, openerVip)}\n`}
             {headlinerStart &&
-               `AT MAIN: ${formatSection(
+               `                AT MAIN: ${formatSection(
                   headlinerGa,
                   headlinerRes,
                   headlinerVip
                )}\n`}
-            TOTAL SCANNED: {formatSection(totalGa, totalRes, totalVip)}
+            {`TOTAL SCANNED: ${formatSection(totalGa, totalRes, totalVip) + "\n"}`}
+            {`            NO SHOW: ${formatSection(noShowGa, noShowRes, noShowVip)}`}
          </pre>
       </div>
    );
