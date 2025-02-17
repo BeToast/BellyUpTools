@@ -58,15 +58,16 @@
    text-align: left;
    width: 410px;
    margin-bottom: -16px;
+   font-weight: 600;
 }
 .extra-chairs {
    color: rgb(0, 0, 0);
    font-size: 18px;
-   font-weight: 500;
+   font-weight: 800;
 }
 .input.notes {
    font-family: Arial;
-   font-size: 18px;
+   font-size: 16px;
    font-weight: 300;
    text-align: left;
    line-height: 1.5;
@@ -86,6 +87,9 @@
    .input:placeholder-shown {
       font-size: 0px;
       border: transparent;
+   }
+   .input.notes{
+      overflow-y: hidden;
    }
    .input.show:placeholder-shown {
       font-size: 0px;

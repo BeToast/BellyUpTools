@@ -170,7 +170,7 @@ const Inputs: React.FC = () => {
          <div className="extra-chairs-wrapper">
             <div className="extra-chairs">
                {extraChairs > 0
-                  ? `${extraChairs} Extra Chairs`
+                  ? `${extraChairs} Extra Chair${extraChairs > 1 ? "s" : ""}`
                   : "No Extra Chairs"}
             </div>
          </div>

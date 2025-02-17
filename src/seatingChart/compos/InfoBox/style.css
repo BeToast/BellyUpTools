@@ -54,7 +54,7 @@
    padding-left: var(--info-padding-x);
    /* calculate width excluding padding */
    width: calc(var(--info-width) - var(--info-padding-x) * 2);
-   max-height: 100%;
+   /* max-height: 100%; */
    transition: all 0.3s;
 }
 .party-input-label {
@@ -190,7 +190,6 @@
    flex-grow: 1;
    display: flex;
    flex-direction: column;
-   min-height: 0;
 }
 
 .info-box > .section > .absolute {
