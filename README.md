@@ -21,6 +21,16 @@ creates sales pacing data from the buyers report in this format:
 
 *all values including cancelled tickets*
 
+#### 3) Scan Report
+outputs scan counts/percentages at various times during the show in this format:  
+\# = count, % = percent
+- AT SUPPORT: ga(#, %) res(#, %) vip(#, %)
+- AT MAIN: ga(#, %) res(#, %) vip(#, %)
+- TOTAL SCANNED: ga(#, %) res(#, %) vip(#, %)
+- NO SHOW: ga(#, %) res(#, %) vip(#, %)
+
+
+
 
 [https://bellyuptools.web.app/reportTools](https://bellyuptools.web.app/reportTools)  
 <br/>
