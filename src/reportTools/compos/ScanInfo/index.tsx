@@ -110,9 +110,6 @@ const ScanInfo: React.FC<{ scanReportFileName: string; json: any[] }> = ({
    const totalSoldRes = totalRes + noShowRes;
    const totalSoldVip = totalVip + noShowVip;
 
-
-   console.log(`${noShowGa}\n${noShowRes}\n${noShowVip}`);
-
    return (
       <div className="card sub">
          <h2>TIX SCANNED</h2>
