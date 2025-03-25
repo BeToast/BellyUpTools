@@ -43,6 +43,7 @@ const ResBuyers: React.FC<{
                Delivery: row["Delivery"]?.toString() ?? "",
                QTY: parseInt(row["QTY"]?.toString() ?? "0", 10) || 0,
             }))
+            .sort((a, b) => a.Last.localeCompare(b.Last)) // Sort by Last name
       );
    }, [json]);
 
